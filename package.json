@@ -1,0 +1,42 @@
+{
+  "name": "invoice-generator-api",
+  "version": "1.0.0",
+  "description": "Helps businesses generate invoices and receive payments",
+  "main": "start.js",
+  "scripts": {
+    "dev": "nodemon start.js",
+    "seed": "cross-env NODE_ENV=test node src/seed/all.js",
+    "only_test": "cross-env NODE_ENV=test jest --forceExit",
+    "start": "node start.js"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ]
+  },
+  "author": "praytech.io",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/core": "^7.18.9",
+    "@babel/node": "^7.18.9",
+    "@babel/preset-env": "^7.18.9",
+    "@babel/register": "^7.18.9",
+    "axios": "^1.2.2",
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "cross-env": "^7.0.3",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "http-status": "^1.5.0",
+    "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.13.2",
+    "pdfkit": "^0.16.0",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "jest": "^29.0.1",
+    "supertest": "^6.2.4"
+  }
+}
