@@ -5,33 +5,39 @@ const { errorResponse } = require('../utils/responder');
 
 const errorConverter = (err, req, res, next) => {
   let error = err;
-  console.log(error);
+
+  // Log the original error for debugging
+  console.log('Original error:', error);
+
+  // Handle specific error types
   if (error.name === 'CastError') {
-    const message = `Resource not found`;
-    error = new ApiError(httpStatus.NOT_FOUND, 'Resource not Found');
-  }
-  if (err.name === 'TokenExpiredError') {
-    const message = 'You shall not pass';
-    error = new ApiError(httpStatus.FORBIDDEN, message);
-  }
-  // Mongoose duplicate key
-  if (error.code === 11000) {
+    const message = 'Resource not found';
+    error = new ApiError(httpStatus.NOT_FOUND, message, true);
+  } else if (error.name === 'TokenExpiredError') {
+    const message = 'Token has expired. Please sign in again.';
+    error = new ApiError(httpStatus.FORBIDDEN, message, true);
+  } else if (error.code === 11000) { // Mongoose duplicate key
     const message = 'Duplicate field value entered';
-    error = new ApiError(httpStatus.BAD_REQUEST, message);
+    error = new ApiError(httpStatus.BAD_REQUEST, message, true);
+  } else if (error.name === 'ValidationError') { // Mongoose validation error
+    const message = Object.values(error.errors)
+      .map((val) => val.message)
+      .join(', ');
+    error = new ApiError(httpStatus.BAD_REQUEST, message, true);
+  } else if (error.name === 'JsonWebTokenError') {
+    const message = 'Invalid token. Please sign in again.';
+    error = new ApiError(httpStatus.FORBIDDEN, message, true);
   }
-  // Mongoose validation error
-  if (err.name === 'ValidationError') {
-    const message = Object.values(err.errors).map((val) => val.message);
-    error = new ApiError(httpStatus.BAD_REQUEST, message);
-  }
-  if (err.name === 'JsonWebTokenError') {
-    const message = 'You shall not pass';
-    error = new ApiError(httpStatus.FORBIDDEN, message);
-  }
+
+  // Convert non-ApiError instances to ApiError
   if (!(error instanceof ApiError)) {
-    const statusCode = error.statusCode || httpStatus.INTERNAL_SERVER_ERROR;
-    const message = error.message || httpStatus[statusCode];
-    error = new ApiError(statusCode, message, false, err.stack);
+    const statusCode =
+      error.statusCode && Number.isInteger(error.statusCode)
+        ? error.statusCode
+        : httpStatus.INTERNAL_SERVER_ERROR;
+    const message = error.message || httpStatus[statusCode] || 'Internal Server Error';
+    const isOperational = statusCode !== httpStatus.INTERNAL_SERVER_ERROR;
+    error = new ApiError(statusCode, message, isOperational, error.stack);
   }
 
   next(error);
@@ -39,25 +45,40 @@ const errorConverter = (err, req, res, next) => {
 
 const errorHandler = (err, req, res, next) => {
   let { statusCode, message } = err;
-  statusCode = statusCode || httpStatus.INTERNAL_SERVER_ERROR;
-  if (statusCode === httpStatus.INTERNAL_SERVER_ERROR) {
-    message = 'Oh sugar! we have a problem, please check back later';
-  }
-  res.locals.errorMessage = err.message;
-  if (
-    statusCode === httpStatus.INTERNAL_SERVER_ERROR ||
-    process.env.ENV === 'test'
-  ) {
-    console.log(err);
+
+  // Ensure statusCode is valid
+  statusCode = Number.isInteger(statusCode) ? statusCode : httpStatus.INTERNAL_SERVER_ERROR;
+
+  // Log the error for debugging (except in test environment)
+  if (process.env.NODE_ENV !== 'test') {
+    console.error('Error:', {
+      statusCode,
+      message,
+      stack: err.stack,
+      isOperational: err.isOperational
+    });
   }
 
-  return errorResponse(
-    req,
-    res,
-    message,
+  // Override message for non-operational 500 errors
+  if (statusCode === httpStatus.INTERNAL_SERVER_ERROR && !err.isOperational) {
+    message = 'Oh sugar! We have a problem, please check back later';
+  }
+
+  // Store the error message in res.locals for potential logging middleware
+  res.locals.errorMessage = err.message;
+
+  // Include stack trace in development or test environments
+  const response = {
+    status: 'error',
     statusCode,
-    process.env.ENV === 'test' && { stack: err.stack }
-  );
+    message
+  };
+
+  if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
+    response.stack = err.stack;
+  }
+
+  return errorResponse(req, res, message, statusCode, response);
 };
 
 module.exports = {

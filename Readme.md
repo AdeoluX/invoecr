@@ -13,7 +13,7 @@ Microservice template
 - runs on `PORT: 5115`
 
 ## End Points
-- base_url is `http://localhost:5115`
+- base_url is `http://localhost:5110
 
 - endpoint to get all urban area `GET` `${base_url}/api/v1/urban-areas`
 

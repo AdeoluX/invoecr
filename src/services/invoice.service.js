@@ -1,34 +1,208 @@
 const Invoice = require('../models/invoice.model');
 const { abortIf } = require('../utils/responder');
-const httpStatus = require('http-status');
+const httpStatus = require('http-status').default;
 const invoiceRepository = require('../repo/invoice.repo');
+const customerRepository = require('../repo/customer.repo');
 const PDFDocument = require('pdfkit');
+const getPagination = require('../utils/pagination');
+const { default: mongoose } = require('mongoose');
+const { generateInvoice } = require('../utils/invoice');
 
 
 class InvoiceService {
   // Create a new invoice
-  static createInvoice = async (data) => {
-    const invoice = await invoiceRepository.create(data)
+  static createInvoice = async (data, entity_id) => {
+    let customer;
+    abortIf(!data.customer && !data.customerId, httpStatus.BAD_REQUEST, 'Customer is required');
+    if(data.customerId){
+      customer = await customerRepository.findOne({ query: { _id: data.customerId } });
+      abortIf(!customer, httpStatus.NOT_FOUND, 'Customer not found');
+    }else if(data.customer){
+      customer = await customerRepository.create({
+        ...data.customer,
+        entity: entity_id,
+      })
+      abortIf(!customer, httpStatus.BAD_REQUEST, 'Error creating customer');
+    }
+    const { customer: user, customer_id, ...rest } = data;
+    const invoice = await invoiceRepository.create({...rest, customer: customer._id, entity: entity_id, status: 'draft' });
+    abortIf(!invoice, httpStatus.BAD_REQUEST, 'Error creating invoice');
     return invoice;
   };
 
   // Get all invoices
-  static getAllInvoices = async () => {
-    const invoices = await invoiceRepository.findAll({
-      query: { status: 'draft' },
-      select: 'invoiceNumber status',  // Selecting only specific fields
-      sort: { issueDate: -1 }, // Sort by issue date in descending order
-      populate: [{ path: 'customer', select: 'name email' }, { path: 'items' }], // Populate customer and items
+  static getAllInvoices = async (entity_id, filters = {}) => {
+    let {
+      status,
+      search,
+      customerCode,
+      gteAmount,
+      lteAmount,
+      startDate,
+      endDate,
+      orderBy = 'issueDate',
+      orderDirection = 'desc',
+      page = 1,
+      perPage = 10
+    } = filters;
+  
+    const matchStage = {
+      entity: new mongoose.Types.ObjectId(entity_id),
+    };
+  
+    if (status) {
+      matchStage.status = { $in: status.split(',') };
+    }
+  
+    if (gteAmount || lteAmount) {
+      matchStage.subtotal = {};
+      if (gteAmount) matchStage.subtotal.$gte = Number(gteAmount);
+      if (lteAmount) matchStage.subtotal.$lte = Number(lteAmount);
+    }
+  
+    if (startDate || endDate) {
+      matchStage.issueDate = {};
+      if (startDate) {
+        const start = new Date(startDate);
+        abortIf(isNaN(start.getTime()), httpStatus.BAD_REQUEST, 'Invalid startDate format');
+        matchStage.issueDate.$gte = start;
+      }
+      if (endDate) {
+        const end = new Date(endDate);
+        abortIf(isNaN(end.getTime()), httpStatus.BAD_REQUEST, 'Invalid endDate format');
+        end.setHours(23, 59, 59, 999);
+        matchStage.issueDate.$lte = end;
+      }
+    }
+  
+    const pipeline = [
+      { $match: matchStage },
+      {
+        $lookup: {
+          from: 'customers',
+          localField: 'customer',
+          foreignField: '_id',
+          as: 'customer'
+        }
+      },
+      { $unwind: '$customer' },
+      {
+        $lookup: {
+          from: 'entities',
+          localField: 'entity',
+          foreignField: '_id',
+          as: 'entity'
+        }
+      },
+      { $unwind: '$entity' }
+    ];
+  
+    // Handle customerCode and search
+    const searchMatch = {};
+    if (customerCode) {
+      searchMatch['customer.code'] = customerCode;
+    }
+    if (search) {
+      searchMatch.$or = [
+        { invoiceNumber: { $regex: search, $options: 'i' } },
+        { 'items.name': { $regex: search, $options: 'i' } },
+        { 'customer.name': { $regex: search, $options: 'i' } },
+        { 'customer.email': { $regex: search, $options: 'i' } }
+      ];
+      if (!customerCode) {
+        searchMatch.$or.push({ 'customer.code': { $regex: search, $options: 'i' } });
+      }
+    }
+    if (Object.keys(searchMatch).length > 0) {
+      pipeline.push({ $match: searchMatch });
+    }
+  
+    // Sorting
+    const sort = {};
+    const validOrderFields = ['issueDate', 'dueDate', 'subtotal', 'invoiceNumber', 'status'];
+    if (!validOrderFields.includes(orderBy)) {
+      throw new Error(`Invalid orderBy field. Must be one of: ${validOrderFields.join(', ')}`);
+    }
+    const validDirections = ['asc', 'desc'];
+    if (!validDirections.includes(orderDirection)) {
+      throw new Error(`Invalid orderDirection. Must be one of: ${validDirections.join(', ')}`);
+    }
+    sort[orderBy] = orderDirection === 'asc' ? 1 : -1;
+    pipeline.push({ $sort: sort });
+  
+    // Pagination
+    const pagination = getPagination(page, perPage);
+    const { skip, limit } = pagination;
+    pipeline.push({ $skip: skip }, { $limit: limit });
+  
+    // Projection
+    pipeline.push({
+      $project: {
+        invoiceNumber: 1,
+        status: 1,
+        subtotal: 1,
+        issueDate: 1,
+        dueDate: 1,
+        'customer.name': 1,
+        'customer.email': 1,
+        'customer.code': 1,
+        items: 1,
+        'entity.name': 1
+      }
     });
-    return invoices;
+  
+    // Execute the aggregation pipeline
+    const invoices = await invoiceRepository.aggregate(pipeline);
+  
+    // Count total documents
+    const countPipeline = [
+      { $match: matchStage },
+      { $lookup: { from: 'customers', localField: 'customer', foreignField: '_id', as: 'customer' } },
+      { $unwind: '$customer' }
+    ];
+    if (Object.keys(searchMatch).length > 0) {
+      countPipeline.push({ $match: searchMatch });
+    }
+    countPipeline.push({ $count: 'total' });
+    const countResult = await invoiceRepository.aggregate(countPipeline);
+    const total = countResult.length > 0 ? countResult[0].total : 0;
+  
+    // Calculate total pages
+    const totalPages = Math.ceil(total / pagination.perPage);
+  
+    return {
+      invoices,
+      pagination: {
+        total,
+        page: pagination.page,
+        perPage: pagination.perPage,
+        totalPages,
+        hasNextPage: pagination.page < totalPages,
+        hasPrevPage: pagination.page > 1
+      }
+    };
   };
+  
 
   // Get a single invoice by ID
-  static getInvoiceById = async (invoiceId) => {
-    const invoice = await invoiceRepository.findOne({ query: { _id: invoiceId }, populate: [{path: 'customer', select: 'name email'}] });
+  static getInvoiceById = async (code, entity_id) => {
+    const invoice = await invoiceRepository.findOne({ query: { invoiceNumber: code, entity: entity_id }, populate: [{path: 'customer', select: 'name email'}, {path: 'entity'}] });
     abortIf(!invoice, httpStatus.NOT_FOUND, 'Invoice not found');
     return invoice;
   };
+
+  static downloadInvoiceById = async (code, entity_id) => {
+    const invoice = await invoiceRepository.findOne({ query: { invoiceNumber: code, entity: entity_id }, populate: [{path: 'customer', select: 'name email'}, {path: 'entity'}] });
+    abortIf(!invoice, httpStatus.NOT_FOUND, 'Invoice not found');
+    const generatePDF = await generateInvoice({
+      ...invoice.toJSON(), 
+      businessName: invoice.entity.name, 
+      logoPath: invoice?.entity?.logo || '',
+      paymentLink: `${process.env.APP_URL}/payment/${invoice.invoiceNumber}`,
+      vatRate: (invoice.tax / invoice.subtotal) * 100,
+    }, code);
+    return invoice;
+  }
 
   // Update an invoice by ID
   static updateInvoice = async (invoiceId, data) => {

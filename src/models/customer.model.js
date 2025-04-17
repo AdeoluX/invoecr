@@ -4,9 +4,9 @@ var crypto = require('crypto'); // Assuming you're using Node's built-in crypto 
 
 var customerSchema = new Schema({
   code: {
-    type: Schema.Types.UUID, // You can also use Schema.Types.String if UUIDs are stored as strings
+    type: String, // You can also use Schema.Types.String if UUIDs are stored as strings
     default: function() {
-      return 'cus_' + crypto.randomUUID(); // Replaced arrow function with a regular function
+      return 'cus_' + crypto.randomUUID().split('-').join(''); // Replaced arrow function with a regular function
     }
   },
   name: { type: String, required: true },
@@ -15,8 +15,9 @@ var customerSchema = new Schema({
   address: { type: String },
   companyName: { type: String },
   entity: {
-    type: Schema.Types.UUID,
-    ref: 'Entity'
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Entity',
+    required: true // or false depending on your schema needs
   }
 }, { timestamps: true });
 

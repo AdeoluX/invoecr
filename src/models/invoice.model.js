@@ -1,13 +1,15 @@
 var mongoose = require('mongoose');
+var crypto = require('crypto');
 var itemSchema = require('./item.model'); // Assuming itemSchema is exported from './item.model'
 
 var invoiceSchema = new mongoose.Schema({
   invoiceNumber: {
-    type: mongoose.Schema.Types.UUID,
+    type: String,
     default: function() {
-      return 'inv_' + crypto.randomUUID(); // Adjusted to use a regular function instead of an arrow function
+      return 'inv_' + crypto.randomUUID().split('-').join('').slice(0, 17); // Adjusted to use a regular function instead of an arrow function
     }
   },
+  currency: { type: String, required: true },
   customer: { type: mongoose.Schema.Types.ObjectId, ref: 'Customer', required: true },
   entity: { type: mongoose.Schema.Types.ObjectId, ref: 'Entity', required: true },
   items: [itemSchema],

@@ -7,20 +7,31 @@ class InvoiceController {
   // Create a new invoice
   static createInvoice = catchAsync(async (req, res, next) => {
     const invoiceData = req.body;
-    const invoice = await InvoiceService.createInvoice(invoiceData);
+    const user = req.user; 
+    const invoice = await InvoiceService.createInvoice(invoiceData, user.id);
     return successResponse(req, res, invoice);
   });
 
   // Get all invoices
   static getAllInvoices = catchAsync(async (req, res, next) => {
-    const invoices = await InvoiceService.getAllInvoices();
+    const user = req.user;
+    const query = req.query;
+    const invoices = await InvoiceService.getAllInvoices(user.id, query);
     return successResponse(req, res, invoices);
   });
 
   // Get a single invoice by ID
   static getInvoiceById = catchAsync(async (req, res, next) => {
-    const { invoiceId } = req.params;
-    const invoice = await InvoiceService.getInvoiceById(invoiceId);
+    const { code } = req.params;
+    const user = req.user;
+    const invoice = await InvoiceService.getInvoiceById(code, user.id);
+    return successResponse(req, res, invoice);
+  });
+
+  static downloadInvoiceById = catchAsync(async (req, res, next) => {
+    const { code } = req.params;
+    const user = req.user;
+    const invoice = await InvoiceService.downloadInvoiceById(code, user.id);
     return successResponse(req, res, invoice);
   });
 

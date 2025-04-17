@@ -4,13 +4,13 @@ var crypto = require('crypto'); // Assuming you're using Node's built-in crypto 
 
 var entitySchema = new Schema({
   code: {
-    type: Schema.Types.UUID, // You can also use Schema.Types.String if UUIDs are stored as strings
+    type: String, // You can also use Schema.Types.String if UUIDs are stored as strings
     default: function() {
-      return 'ent_' + crypto.randomUUID(); // Replaced arrow function with a regular function
+      return 'ent_' + crypto.randomUUID().split('-').join(''); // Replaced arrow function with a regular function
     }
   },
   parent_id: {
-    type: Schema.Types.UUID,
+    type: String,
     ref: 'Entity',
     default: null
   },

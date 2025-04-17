@@ -1,0 +1,6 @@
+MONGODB_URI=mongodb+srv://d1headphones:Peg8uGoq5dasmYim@cluster0.iricjxy.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+
+
+CLOUDINARY_API_SECRET=Ao31l4AIkPDvl4JWCn5wOA3RWbQ
+CLOUDINARY_API_KEY=881119323344495
+CLOUDINARY_CLOUD_NAME=jakin

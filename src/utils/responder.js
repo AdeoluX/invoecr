@@ -1,4 +1,4 @@
-const httpStatus = require('http-status');
+const httpStatus = require('http-status').default;
 const ApiError = require('./ApiError');
 const stream = require('stream');
 // const JSZip = require('jszip');
