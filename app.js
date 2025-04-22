@@ -26,6 +26,10 @@ app.use(cors(corsOptions));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+app.get('/', (req, res) => {
+  res.send('Server is up and running!');
+});
+
 // Routes
 app.use('/api/v1', authRoute);
 app.use('/api/v1', invoiceRoute);
