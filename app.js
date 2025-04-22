@@ -5,9 +5,9 @@ const app = express();
 const ApiError = require('./src/utils/ApiError');
 const httpStatus = require('http-status');
 const cors = require('cors');
-const { authRoute, invoiceRoute } = require('./src/routes');
+const { authRoute, invoiceRoute, utilsRoute, entityRoute, webHookRoute } = require('./src/routes');
 const { errorConverter, errorHandler } = require('./src/middleware/error');
-import fileUpload from "express-fileupload";
+const fileUpload = require("express-fileupload");
 const dbConnect = require('./src/config/db.config');
 
 const corsOptions = {
@@ -28,7 +28,10 @@ app.use(express.json());
 
 // Routes
 app.use('/api/v1', authRoute);
-app.use('/api/v1', invoiceRoute)
+app.use('/api/v1', invoiceRoute);
+app.use('/api/v1', utilsRoute);
+app.use('/api/v1', entityRoute);
+app.use('/api/v1', webHookRoute);
 
 // Catch-all for 404 errors
 app.use((req, res, next) => {

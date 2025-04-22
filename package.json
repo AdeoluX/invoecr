@@ -34,6 +34,7 @@
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.13.2",
+    "paystack": "^2.0.1",
     "pdfkit": "^0.16.0",
     "uuid": "^11.1.0"
   },

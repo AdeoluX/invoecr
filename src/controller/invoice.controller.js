@@ -20,6 +20,12 @@ class InvoiceController {
     return successResponse(req, res, invoices);
   });
 
+  static initiatePayment = catchAsync(async (req, res, next) => {
+    const { code } = req.params;
+    const invoices = await InvoiceService.initiatePayment(code);
+    return successResponse(req, res, invoices);
+  });
+
   // Get a single invoice by ID
   static getInvoiceById = catchAsync(async (req, res, next) => {
     const { code } = req.params;

@@ -12,6 +12,7 @@ const BASE = '/invoice';
 // Invoice routes
 router.post(`${BASE}`, validateReq(createInvoiceSchema), Authorization.authenticateToken, InvoiceController.createInvoice);
 router.get(`${BASE}`, Authorization.authenticateToken, InvoiceController.getAllInvoices);
+router.post(`${BASE}/:code/initiate-payment`, InvoiceController.initiatePayment);
 router.get(`${BASE}/:code`, Authorization.authenticateToken, InvoiceController.getInvoiceById);
 router.get(`${BASE}/:code/download`, Authorization.authenticateToken, InvoiceController.downloadInvoiceById);
 router.put(`${BASE}/:invoiceId`, validateReq(updateInvoiceSchema), InvoiceController.updateInvoice);

@@ -7,6 +7,9 @@ const PDFDocument = require('pdfkit');
 const getPagination = require('../utils/pagination');
 const { default: mongoose } = require('mongoose');
 const { generateInvoice } = require('../utils/invoice');
+const { PaystackPaymentGateway } = require('../utils/paystack.utils');
+const transactionRepo = require('../repo/transaction.repo');
+const bankRepo = require('../repo/bankAccount.repo');
 
 
 class InvoiceService {
@@ -278,6 +281,54 @@ class InvoiceService {
     // Finalize PDF document
     doc.end();
   };
+
+  static initiatePayment = async (code) => {
+    const invoice = await invoiceRepository.findOne({ query: { invoiceNumber: code }, populate: [{path: 'customer', select: 'name email'}, {path: 'entity'}] });
+    abortIf(!invoice, httpStatus.NOT_FOUND, 'Invoice not found');
+    abortIf(['paid'].includes(invoice.status), httpStatus.BAD_REQUEST, 'Invoice is in draft status');
+    let reference = crypto.randomUUID().split('-').join('').slice(0, 17)
+    const getSubAccount = await bankRepo.findOne({
+      query: {
+        entity: invoice.entity,
+        isActive: true
+      }
+    })
+    const transaction = await transactionRepo.create({
+      customer: invoice.customer._id,
+      entity: invoice.entity._id,
+      invoice: invoice._id,
+      amount: invoice.total,
+      currency: 'NGN',
+      type: 'PAYMENT',
+      status: 'PENDING',
+      channel: 'PAYSTACK',
+      reference,
+      description: `Payment for invoice ${invoice.invoiceNumber}`,
+    });
+    const paystackGateway = new PaystackPaymentGateway();
+    const paymentResponse = await paystackGateway.initiatePayment({
+      email: invoice.customer.email,
+      amount: invoice.total * 100,
+      reference,
+      subaccount: getSubAccount.subAccountCode,
+      metadata: {
+        custom_fields: [
+          {
+            display_name: 'Company',
+            variable_name: 'company_name',
+            value: invoice.entity.name
+          },
+          {
+            display_name: 'Logo',
+            variable_name: 'logo_url',
+            value: invoice?.entity?.logo || ''
+          }
+        ]
+      },
+    });
+    abortIf(!paymentResponse.success, httpStatus.BAD_REQUEST, paymentResponse.message);
+    return paymentResponse;
+  }
 }
 
 module.exports = {
