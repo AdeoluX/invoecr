@@ -35,6 +35,7 @@ app.use('/api/v1', webHookRoute);
 
 // Catch-all for 404 errors
 app.use((req, res, next) => {
+  console.log(`Endpoint not found: ${req.method} ${req.originalUrl}`);
   next(new ApiError(httpStatus.NOT_FOUND, 'Not found', true));
 });
 
