@@ -23,24 +23,24 @@ class BaseRepository {
   } = {}) {
     try {
       let queryBuilder = this.model.find(query);
-  
+
       if (select) {
         queryBuilder = queryBuilder.select(select);
       }
-  
+
       if (sort) {
         queryBuilder = queryBuilder.sort(sort);
       }
-  
+
       if (populate) {
         queryBuilder = queryBuilder.populate(populate);
       }
-  
+
       return await queryBuilder.exec();
     } catch (error) {
       throw new Error(`Failed to fetch documents: ${error.message}`);
     }
-  }  
+  }
 
   // Paginate documents with sorting, selection, and population
   async paginate({
@@ -108,11 +108,11 @@ class BaseRepository {
   async findOne({ query = {}, select = null, sort = null, populate = null } = {}) {
     try {
       let queryBuilder = this.model.findOne(query);
-  
+
       if (select) queryBuilder = queryBuilder.select(select);
       if (sort) queryBuilder = queryBuilder.sort(sort);
       if (populate) queryBuilder = queryBuilder.populate(populate);
-  
+
       const document = await queryBuilder.exec();
       return document;
     } catch (error) {

@@ -8,6 +8,25 @@ const addBankSchema = {
     }),
 }
 
+const editEntitySchema = {
+    body: Joi.object().required().keys({
+        phone: Joi.string().optional(),
+        logo: Joi.string().optional(),
+        address: Joi.string().optional(),
+    })
+}
+
+const addMemberSchema = {
+    body: Joi.object().required().keys({
+        first_name: Joi.string().required(),
+        last_name: Joi.string().required(),
+        email: Joi.string().required(),
+        type: Joi.string().required(),
+    })
+}
+
 module.exports = {
-    addBankSchema
+    addBankSchema,
+    editEntitySchema,
+    addMemberSchema
 }

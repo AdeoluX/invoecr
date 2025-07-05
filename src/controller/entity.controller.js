@@ -28,6 +28,20 @@ class EntityController {
     const entity = await UtilsService.verifyBankNumber(accountNumber, bankCode)
     return successResponse(req, res, entity, 'Operation Successful');
   });
+
+  static editEntity = catchAsync(async (req, res, next) => {
+    const entity = req.user;
+    const data = req.body;
+    const editEntity = await EntityService.editEntity({ data, entity });
+    return successResponse(req, res, editEntity, 'Operation Successful');
+  })
+
+  static addMember = catchAsync(async (req, res, next) => {
+    const entity = req.user;
+    const data = req.body;
+    const addMember = await EntityService.addMember({ data, entity });
+    return successResponse(req, res, addMember, 'Operation Successful');
+  })
 }
 
 module.exports = {
