@@ -1,20 +1,18 @@
 class BaseRepository {
   constructor(model) {
-    if (!model) throw new Error('Model is required');
+    if (!model) throw new Error("Model is required");
     this.model = model;
   }
 
-  // Create a new document
   async create(data) {
     try {
       const document = new this.model(data);
       return await document.save();
     } catch (error) {
-      throw new Error(`Failed to create document: ${error.message}`);
+      throw new Error(`Create Error: ${error.message}`);
     }
   }
 
-  // Find all documents with sorting and selection
   async findAll({
     query = {},
     select = null,
@@ -24,25 +22,16 @@ class BaseRepository {
     try {
       let queryBuilder = this.model.find(query);
 
-      if (select) {
-        queryBuilder = queryBuilder.select(select);
-      }
-
-      if (sort) {
-        queryBuilder = queryBuilder.sort(sort);
-      }
-
-      if (populate) {
-        queryBuilder = queryBuilder.populate(populate);
-      }
+      if (select) queryBuilder = queryBuilder.select(select);
+      if (sort) queryBuilder = queryBuilder.sort(sort);
+      if (populate) queryBuilder = queryBuilder.populate(populate);
 
       return await queryBuilder.exec();
     } catch (error) {
-      throw new Error(`Failed to fetch documents: ${error.message}`);
+      throw new Error(`FindAll Error: ${error.message}`);
     }
   }
 
-  // Paginate documents with sorting, selection, and population
   async paginate({
     query = {},
     page = 1,
@@ -55,22 +44,16 @@ class BaseRepository {
       const skip = (page - 1) * limit;
       let queryBuilder = this.model.find(query);
 
-      if (select) {
-        queryBuilder = queryBuilder.select(select);
-      }
-
-      if (sort) {
-        queryBuilder = queryBuilder.sort(sort);
-      }
-
-      if (populate) {
-        queryBuilder = queryBuilder.populate(populate);
-      }
+      if (select) queryBuilder = queryBuilder.select(select);
+      if (sort) queryBuilder = queryBuilder.sort(sort);
+      if (populate) queryBuilder = queryBuilder.populate(populate);
 
       queryBuilder = queryBuilder.skip(skip).limit(limit);
 
-      const documents = await queryBuilder.exec();
-      const total = await this.model.countDocuments(query);
+      const [documents, total] = await Promise.all([
+        queryBuilder.exec(),
+        this.model.countDocuments(query),
+      ]);
 
       return {
         data: documents,
@@ -80,11 +63,11 @@ class BaseRepository {
           limit: Number(limit),
           pages: Math.ceil(total / limit),
           hasNextPage: Number(page) < Math.ceil(total / limit),
-          hasPrevPage: Number(page) > 1
-        }
+          hasPrevPage: Number(page) > 1,
+        },
       };
     } catch (error) {
-      throw new Error(`Failed to paginate documents: ${error.message}`);
+      throw new Error(`Paginate Error: ${error.message}`);
     }
   }
 
@@ -92,20 +75,24 @@ class BaseRepository {
     try {
       return await this.model.countDocuments(query).exec();
     } catch (error) {
-      throw new Error(`Failed to count documents: ${error.message}`);
+      throw new Error(`CountDocuments Error: ${error.message}`);
     }
   }
 
-  // New: Aggregate method to support MongoDB aggregation pipelines
   async aggregate(pipeline) {
     try {
       return await this.model.aggregate(pipeline).exec();
     } catch (error) {
-      throw new Error(`Failed to execute aggregation: ${error.message}`);
+      throw new Error(`Aggregate Error: ${error.message}`);
     }
   }
 
-  async findOne({ query = {}, select = null, sort = null, populate = null } = {}) {
+  async findOne({
+    query = {},
+    select = null,
+    sort = null,
+    populate = null,
+  } = {}) {
     try {
       let queryBuilder = this.model.findOne(query);
 
@@ -113,62 +100,58 @@ class BaseRepository {
       if (sort) queryBuilder = queryBuilder.sort(sort);
       if (populate) queryBuilder = queryBuilder.populate(populate);
 
-      const document = await queryBuilder.exec();
-      return document;
+      return await queryBuilder.exec();
     } catch (error) {
-      throw new Error(`Failed to find document: ${error.message}`);
+      throw new Error(`FindOne Error: ${error.message}`);
     }
   }
 
   async findById(id, select = null) {
     try {
       let query = this.model.findById(id);
-      if (select) {
-        query = query.select(select);
-      }
-      const document = await query.exec();
-      return document;
+      if (select) query = query.select(select);
+      return await query.exec();
     } catch (error) {
-      throw new Error(`Failed to find document: ${error.message}`);
+      throw new Error(`FindById Error: ${error.message}`);
     }
   }
 
   async update(id, updateData) {
     try {
-      const document = await this.model.findByIdAndUpdate(id, updateData, { new: true, runValidators: true });
-      return document;
+      return await this.model.findByIdAndUpdate(id, updateData, {
+        new: true,
+        runValidators: true,
+      });
     } catch (error) {
-      throw new Error(`Failed to update document: ${error.message}`);
+      throw new Error(`Update Error: ${error.message}`);
     }
   }
 
   async delete(id) {
     try {
-      const document = await this.model.findByIdAndDelete(id);
-      return document;
+      return await this.model.findByIdAndDelete(id);
     } catch (error) {
-      throw new Error(`Failed to delete document: ${error.message}`);
+      throw new Error(`Delete Error: ${error.message}`);
     }
   }
 
   async insertMany(dataArray, options = {}) {
     try {
       if (!Array.isArray(dataArray)) {
-        throw new Error('Data must be an array');
+        throw new Error("Data must be an array");
       }
       return await this.model.insertMany(dataArray, options);
     } catch (error) {
-      throw new Error(`Failed to insert documents: ${error.message}`);
+      throw new Error(`InsertMany Error: ${error.message}`);
     }
   }
 
   async seed(dataArray) {
     try {
       await this.model.deleteMany({});
-      const seededDocuments = await this.model.insertMany(dataArray);
-      return seededDocuments;
+      return await this.model.insertMany(dataArray);
     } catch (error) {
-      throw new Error(`Failed to seed database: ${error.message}`);
+      throw new Error(`Seed Error: ${error.message}`);
     }
   }
 }
