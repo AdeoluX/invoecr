@@ -1,7 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const { SubscriptionController } = require("../controller");
-const { Authorization } = require("../middleware");
+const {
+  SubscriptionController,
+} = require("../controller/subscription.controller");
+const Authorization = require("../utils/authorization.service");
 
 const BASE = "/subscription";
 

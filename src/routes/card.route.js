@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { CardController } = require("../controller/card.controller");
-const { Authorization } = require("../middleware");
+const Authorization = require("../utils/authorization.service");
 
 const BASE = "/card";
 
