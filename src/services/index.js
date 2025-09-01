@@ -1,11 +1,19 @@
-const { AuthService } = require('./auth.service');
-const { InvoiceService } = require('./invoice.service');
-const { UtilsService } = require('./utils.service');
-const { EntityService } = require('./entity.service');
+const { AuthService } = require("./auth.service");
+const { InvoiceService } = require("./invoice.service");
+const { UtilsService } = require("./utils.service");
+const { EntityService } = require("./entity.service");
+const TermiiService = require("./termii.service");
+const AnalyticsService = require("./analytics.service");
+const SubscriptionService = require("./subscription.service");
+const CardService = require("./card.service");
 
 module.exports = {
   AuthService,
   InvoiceService,
   UtilsService,
-  EntityService
+  EntityService,
+  TermiiService,
+  AnalyticsService,
+  SubscriptionService,
+  CardService,
 };

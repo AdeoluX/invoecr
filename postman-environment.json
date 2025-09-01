@@ -1,0 +1,45 @@
+{
+  "id": "mock-env-id",
+  "name": "Invoice Generator - Mock Environment",
+  "values": [
+    {
+      "key": "mockUrl",
+      "value": "https://your-mock-server-url.com",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "baseUrl",
+      "value": "https://your-mock-server-url.com",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "secret",
+      "enabled": true
+    },
+    {
+      "key": "entityId",
+      "value": "64f8a1b2c3d4e5f6a7b8c9d0",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "invoiceCode",
+      "value": "INV-2024-001",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "cardId",
+      "value": "64f8a1b2c3d4e5f6a7b8c9d3",
+      "type": "default",
+      "enabled": true
+    }
+  ],
+  "_postman_variable_scope": "environment",
+  "_postman_exported_at": "2024-01-15T10:30:00.000Z",
+  "_postman_exported_using": "Postman/10.0.0"
+}

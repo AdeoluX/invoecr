@@ -5,6 +5,7 @@ const httpStatus = require("http-status").default;
 const entityRepository = require("../repo/entity.repo");
 const jwt = require("jsonwebtoken");
 const Authorization = require("../utils/authorization.service");
+const SubscriptionService = require("./subscription.service");
 
 class AuthService {
   static signup = async ({
@@ -32,6 +33,10 @@ class AuthService {
       logo,
       address,
     });
+
+    // Initialize entity with free subscription plan
+    await SubscriptionService.initializeEntitySubscription(entity._id);
+
     //generate token
     const token = Authorization.generateToken({
       id: entity._id,

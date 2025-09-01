@@ -7,6 +7,7 @@ const entityRepository = require("../repo/entity.repo");
 const { PaystackPaymentGateway } = require("../utils/paystack.utils");
 const jwt = require("jsonwebtoken");
 const Authorization = require("../utils/authorization.service");
+const SubscriptionService = require("./subscription.service");
 
 class EntityService {
   static addBank = async ({

@@ -3,6 +3,7 @@ const { abortIf } = require("../utils/responder");
 const httpStatus = require("http-status").default;
 const invoiceRepository = require("../repo/invoice.repo");
 const customerRepository = require("../repo/customer.repo");
+const entityRepository = require("../repo/entity.repo");
 const PDFDocument = require("pdfkit");
 const getPagination = require("../utils/pagination");
 const { default: mongoose } = require("mongoose");
@@ -10,10 +11,23 @@ const { generateInvoice } = require("../utils/invoice");
 const { PaystackPaymentGateway } = require("../utils/paystack.utils");
 const transactionRepo = require("../repo/transaction.repo");
 const bankRepo = require("../repo/bankAccount.repo");
+const TermiiService = require("./termii.service");
+const AnalyticsService = require("./analytics.service");
+const SubscriptionService = require("./subscription.service");
 
 class InvoiceService {
   // Create a new invoice
   static createInvoice = async (data, entity_id) => {
+    // Check subscription limits
+    const canCreateInvoice = await SubscriptionService.canCreateInvoice(
+      entity_id
+    );
+    abortIf(
+      !canCreateInvoice,
+      httpStatus.FORBIDDEN,
+      "Invoice limit reached. Please upgrade your plan to create more invoices."
+    );
+
     let customer;
     abortIf(
       !data.customer && !data.customerId,
@@ -32,7 +46,31 @@ class InvoiceService {
       });
       abortIf(!customer, httpStatus.BAD_REQUEST, "Error creating customer");
     }
-    const { customer: user, customer_id, ...rest } = data;
+
+    // Get entity details for Nigeria-specific defaults
+    const entity = await entityRepository.findOne({
+      query: { _id: entity_id },
+    });
+
+    // Set Nigeria-specific defaults
+    const invoiceData = {
+      ...data,
+      currency: data.currency || "NGN",
+      country: "NG",
+      paymentGateway: "paystack",
+      taxRate: data.taxRate || 7.5, // Nigerian VAT rate
+    };
+
+    // Calculate VAT if not provided
+    if (data.tax === undefined && invoiceData.taxRate) {
+      const subtotal = data.items.reduce(
+        (acc, item) => acc + item.price * item.quantity,
+        0
+      );
+      invoiceData.tax = (subtotal * invoiceData.taxRate) / 100;
+    }
+
+    const { customer: user, customer_id, ...rest } = invoiceData;
     const invoice = await invoiceRepository.create({
       ...rest,
       customer: customer._id,
@@ -40,6 +78,10 @@ class InvoiceService {
       status: "draft",
     });
     abortIf(!invoice, httpStatus.BAD_REQUEST, "Error creating invoice");
+
+    // Update usage counter
+    await SubscriptionService.updateUsage(entity_id, "invoice", 1);
+
     return invoice;
   };
 
@@ -414,7 +456,123 @@ class InvoiceService {
       httpStatus.BAD_REQUEST,
       paymentResponse.message
     );
+
+    // Update invoice with payment link
+    await invoiceRepository.update(invoice._id, {
+      paymentLink:
+        paymentResponse.data?.authorization_url || paymentResponse.data?.link,
+      paymentGateway: "paystack",
+    });
+
     return paymentResponse;
+  };
+
+  // Share invoice via WhatsApp using Termii
+  static shareViaWhatsApp = async (code, entity_id, customerPhone = null) => {
+    const invoice = await invoiceRepository.findOne({
+      query: { invoiceNumber: code, entity: entity_id },
+      populate: [
+        { path: "customer", select: "name email phone" },
+        { path: "entity" },
+      ],
+    });
+    abortIf(!invoice, httpStatus.NOT_FOUND, "Invoice not found");
+
+    // Use provided phone or customer phone
+    const phoneToUse = customerPhone || invoice.customer.phone;
+    abortIf(
+      !phoneToUse,
+      httpStatus.BAD_REQUEST,
+      "Customer phone number is required for WhatsApp sharing"
+    );
+
+    // Send via Termii WhatsApp
+    const whatsappResult = await TermiiService.sendInvoiceViaWhatsApp(
+      invoice,
+      invoice.entity,
+      phoneToUse
+    );
+
+    // Update invoice with WhatsApp share info
+    await invoiceRepository.update(invoice._id, {
+      whatsappShared: true,
+      whatsappShareDate: new Date(),
+      termiiMessageId: whatsappResult.messageId,
+    });
+
+    return {
+      success: whatsappResult.success,
+      whatsappLink: whatsappResult.whatsappLink,
+      messageId: whatsappResult.messageId,
+      message: whatsappResult.message,
+    };
+  };
+
+  // Share PDF invoice via WhatsApp using Termii
+  static sharePDFInvoiceViaWhatsApp = async (
+    code,
+    entity_id,
+    customerPhone = null,
+    pdfUrl = null
+  ) => {
+    const invoice = await invoiceRepository.findOne({
+      query: { invoiceNumber: code, entity: entity_id },
+      populate: [
+        { path: "customer", select: "name email phone" },
+        { path: "entity" },
+      ],
+    });
+    abortIf(!invoice, httpStatus.NOT_FOUND, "Invoice not found");
+
+    // Use provided phone or customer phone
+    const phoneToUse = customerPhone || invoice.customer.phone;
+    abortIf(
+      !phoneToUse,
+      httpStatus.BAD_REQUEST,
+      "Customer phone number is required for WhatsApp sharing"
+    );
+
+    // If no PDF URL provided, generate one using the existing download endpoint
+    let finalPdfUrl = pdfUrl;
+    if (!finalPdfUrl) {
+      // You can implement PDF generation and upload to cloud storage here
+      // For now, we'll use a placeholder that your mobile app can handle
+      finalPdfUrl = `${process.env.APP_URL}/api/v1/invoice/${code}/download`;
+    }
+
+    // Send PDF via Termii WhatsApp
+    const whatsappResult = await TermiiService.sendPDFInvoiceViaWhatsApp(
+      invoice,
+      invoice.entity,
+      phoneToUse,
+      finalPdfUrl
+    );
+
+    // Update invoice with WhatsApp share info
+    await invoiceRepository.update(invoice._id, {
+      whatsappShared: true,
+      whatsappShareDate: new Date(),
+      termiiMessageId: whatsappResult.messageId,
+    });
+
+    return {
+      success: whatsappResult.success,
+      whatsappLink: whatsappResult.whatsappLink,
+      messageId: whatsappResult.messageId,
+      message: whatsappResult.message,
+      pdfSent: whatsappResult.pdfSent,
+      pdfUrl: finalPdfUrl,
+    };
+  };
+
+  // Get invoice analytics
+  static getInvoiceAnalytics = async (entity_id, filters = {}) => {
+    return await AnalyticsService.getInvoiceAnalytics(entity_id, filters);
+  };
+
+  // Get dashboard summary
+  static getDashboardSummary = async (entity_id) => {
+    return await AnalyticsService.getDashboardSummary(entity_id);
   };
 }
 

@@ -1,13 +1,13 @@
-const catchAsync = require('../utils/catchAsync');
-const { InvoiceService } = require('../services');
-const { successResponse } = require('../utils/responder');
-const httpStatus = require('http-status');
+const catchAsync = require("../utils/catchAsync");
+const { InvoiceService } = require("../services");
+const { successResponse } = require("../utils/responder");
+const httpStatus = require("http-status");
 
 class InvoiceController {
   // Create a new invoice
   static createInvoice = catchAsync(async (req, res, next) => {
     const invoiceData = req.body;
-    const user = req.user; 
+    const user = req.user;
     const invoice = await InvoiceService.createInvoice(invoiceData, user.id);
     return successResponse(req, res, invoice);
   });
@@ -45,7 +45,10 @@ class InvoiceController {
   static updateInvoice = catchAsync(async (req, res, next) => {
     const { invoiceId } = req.params;
     const updatedData = req.body;
-    const updatedInvoice = await InvoiceService.updateInvoice(invoiceId, updatedData);
+    const updatedInvoice = await InvoiceService.updateInvoice(
+      invoiceId,
+      updatedData
+    );
     return successResponse(req, res, updatedInvoice);
   });
 
@@ -59,11 +62,60 @@ class InvoiceController {
   static downloadPdf = catchAsync(async (req, res, next) => {
     const { invoiceId } = req.params;
     const fileData = await InvoiceService.generateInvoicePDF(invoiceId, res);
-    const base64FileData = fileData.toString('base64');
+    const base64FileData = fileData.toString("base64");
     // Provide the file name for the download
     const fileName = `invoice_${invoiceId}.pdf`;
     // Call the function to download the PDF
     await downloadPdfFile(base64FileData, res, fileName);
+  });
+
+  // Share invoice via WhatsApp
+  static shareViaWhatsApp = catchAsync(async (req, res, next) => {
+    const { code } = req.params;
+    const { customerPhone } = req.body;
+    const user = req.user;
+
+    const result = await InvoiceService.shareViaWhatsApp(
+      code,
+      user.id,
+      customerPhone
+    );
+    return successResponse(req, res, result);
+  });
+
+  // Share PDF invoice via WhatsApp
+  static sharePDFInvoiceViaWhatsApp = catchAsync(async (req, res, next) => {
+    const { code } = req.params;
+    const { customerPhone, pdfUrl } = req.body;
+    const user = req.user;
+
+    const result = await InvoiceService.sharePDFInvoiceViaWhatsApp(
+      code,
+      user.id,
+      customerPhone,
+      pdfUrl
+    );
+    return successResponse(req, res, result);
+  });
+
+  // Get invoice analytics
+  static getInvoiceAnalytics = catchAsync(async (req, res, next) => {
+    const user = req.user;
+    const filters = req.query;
+
+    const analytics = await InvoiceService.getInvoiceAnalytics(
+      user.id,
+      filters
+    );
+    return successResponse(req, res, analytics);
+  });
+
+  // Get dashboard summary
+  static getDashboardSummary = catchAsync(async (req, res, next) => {
+    const user = req.user;
+
+    const summary = await InvoiceService.getDashboardSummary(user.id);
+    return successResponse(req, res, summary);
   });
 }
 

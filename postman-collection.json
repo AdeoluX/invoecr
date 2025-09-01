@@ -1,0 +1,708 @@
+{
+  "info": {
+    "name": "Invoice Generator Nigeria - API Collection",
+    "description": "Complete API collection for Nigeria-focused invoice generator with subscription plans and card management",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "{{mockUrl}}",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "entityId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "invoiceCode",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{authToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "User Signup",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Adejuwon Tayo Business\",\n  \"email\": \"tayo@business.com\",\n  \"password\": \"password123\",\n  \"type\": \"freelancer\",\n  \"phone\": \"+2348012345678\",\n  \"first_name\": \"Adejuwon\",\n  \"last_name\": \"Tayo\",\n  \"logo\": \"https://example.com/logo.png\",\n  \"address\": \"Lagos, Nigeria\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/signup",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "signup"]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Adejuwon Tayo Business\",\n  \"email\": \"tayo@business.com\",\n  \"password\": \"password123\",\n  \"type\": \"freelancer\",\n  \"phone\": \"+2348012345678\",\n  \"first_name\": \"Adejuwon\",\n  \"last_name\": \"Tayo\",\n  \"logo\": \"https://example.com/logo.png\",\n  \"address\": \"Lagos, Nigeria\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/signup",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "auth", "signup"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"message\": \"User registered successfully\",\n  \"data\": {\n    \"entity\": {\n      \"_id\": \"64f8a1b2c3d4e5f6a7b8c9d0\",\n      \"name\": \"Adejuwon Tayo Business\",\n      \"email\": \"tayo@business.com\",\n      \"type\": \"freelancer\",\n      \"subscriptionPlan\": \"64f8a1b2c3d4e5f6a7b8c9d1\",\n      \"subscriptionStatus\": \"active\",\n      \"createdAt\": \"2024-01-15T10:30:00.000Z\"\n    },\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZjhhMWIyYzNkNGU1ZjZhN2I4YzlkMCIsImVtYWlsIjoidGF5b0BidXNpbmVzcy5jb20iLCJpYXQiOjE3MzY5NzQyMDAsImV4cCI6MTczNzU4MzAwMH0.example\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "User Signin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"tayo@business.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/signin",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "signin"]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"tayo@business.com\",\n  \"password\": \"password123\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/signin",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "auth", "signin"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Login successful\",\n  \"data\": {\n    \"entity\": {\n      \"_id\": \"64f8a1b2c3d4e5f6a7b8c9d0\",\n      \"name\": \"Adejuwon Tayo Business\",\n      \"email\": \"tayo@business.com\",\n      \"type\": \"freelancer\",\n      \"subscriptionPlan\": \"64f8a1b2c3d4e5f6a7b8c9d1\",\n      \"subscriptionStatus\": \"active\"\n    },\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZjhhMWIyYzNkNGU1ZjZhN2I4YzlkMCIsImVtYWlsIjoidGF5b0BidXNpbmVzcy5jb20iLCJpYXQiOjE3MzY5NzQyMDAsImV4cCI6MTczNzU4MzAwMH0.example\"\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Subscription Plans",
+      "item": [
+        {
+          "name": "Get All Plans",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/subscription/plans",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "subscription", "plans"]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/subscription/plans",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "subscription", "plans"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"_id\": \"64f8a1b2c3d4e5f6a7b8c9d1\",\n      \"name\": \"free\",\n      \"displayName\": \"Freemium\",\n      \"price\": 0,\n      \"currency\": \"NGN\",\n      \"billingCycle\": \"monthly\",\n      \"maxInvoices\": 10,\n      \"maxCustomers\": 5,\n      \"maxTeamMembers\": 1,\n      \"features\": {\n        \"whatsappSharing\": true,\n        \"pdfExport\": true,\n        \"onlinePayments\": false,\n        \"analytics\": false,\n        \"recurringInvoices\": false,\n        \"taxReports\": false,\n        \"whiteLabel\": false,\n        \"apiAccess\": false\n      },\n      \"description\": \"Perfect for small businesses and freelancers just getting started\",\n      \"benefits\": [\n        \"Up to 10 invoices per month\",\n        \"Up to 5 customers\",\n        \"WhatsApp sharing\",\n        \"PDF export\",\n        \"Nigerian VAT support\"\n      ]\n    },\n    {\n      \"_id\": \"64f8a1b2c3d4e5f6a7b8c9d2\",\n      \"name\": \"basic\",\n      \"displayName\": \"Basic\",\n      \"price\": 2000,\n      \"currency\": \"NGN\",\n      \"billingCycle\": \"monthly\",\n      \"maxInvoices\": -1,\n      \"maxCustomers\": -1,\n      \"maxTeamMembers\": 2,\n      \"features\": {\n        \"whatsappSharing\": true,\n        \"pdfExport\": true,\n        \"onlinePayments\": true,\n        \"analytics\": true,\n        \"recurringInvoices\": false,\n        \"taxReports\": false,\n        \"whiteLabel\": false,\n        \"apiAccess\": false\n      },\n      \"description\": \"Ideal for growing businesses that need more features\",\n      \"benefits\": [\n        \"Unlimited invoices\",\n        \"Unlimited customers\",\n        \"Online payments (Paystack)\",\n        \"Basic analytics\",\n        \"WhatsApp sharing\"\n      ]\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Plan Comparison",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/subscription/comparison",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "subscription", "comparison"]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/subscription/comparison",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "subscription", "comparison"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"_id\": \"64f8a1b2c3d4e5f6a7b8c9d1\",\n      \"name\": \"free\",\n      \"displayName\": \"Freemium\",\n      \"price\": 0,\n      \"currency\": \"NGN\",\n      \"features\": [\n        { \"name\": \"whatsappSharing\", \"enabled\": true },\n        { \"name\": \"pdfExport\", \"enabled\": true },\n        { \"name\": \"onlinePayments\", \"enabled\": false },\n        { \"name\": \"analytics\", \"enabled\": false }\n      ]\n    },\n    {\n      \"_id\": \"64f8a1b2c3d4e5f6a7b8c9d2\",\n      \"name\": \"basic\",\n      \"displayName\": \"Basic\",\n      \"price\": 2000,\n      \"currency\": \"NGN\",\n      \"features\": [\n        { \"name\": \"whatsappSharing\", \"enabled\": true },\n        { \"name\": \"pdfExport\", \"enabled\": true },\n        { \"name\": \"onlinePayments\", \"enabled\": true },\n        { \"name\": \"analytics\", \"enabled\": true }\n      ]\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Current Subscription",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/subscription/current",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "subscription", "current"]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/subscription/current",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "subscription", "current"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"entity\": {\n      \"_id\": \"64f8a1b2c3d4e5f6a7b8c9d0\",\n      \"subscriptionPlan\": {\n        \"_id\": \"64f8a1b2c3d4e5f6a7b8c9d1\",\n        \"name\": \"free\",\n        \"displayName\": \"Freemium\",\n        \"price\": 0,\n        \"currency\": \"NGN\"\n      },\n      \"subscriptionStatus\": \"active\",\n      \"subscriptionExpiry\": null,\n      \"invoicesCreated\": 3,\n      \"customersCreated\": 2,\n      \"teamMembersCount\": 1\n    },\n    \"plan\": {\n      \"_id\": \"64f8a1b2c3d4e5f6a7b8c9d1\",\n      \"name\": \"free\",\n      \"maxInvoices\": 10,\n      \"maxCustomers\": 5,\n      \"maxTeamMembers\": 1\n    },\n    \"usage\": {\n      \"invoicesCreated\": 3,\n      \"customersCreated\": 2,\n      \"teamMembersCount\": 1\n    },\n    \"limits\": {\n      \"maxInvoices\": 10,\n      \"maxCustomers\": 5,\n      \"maxTeamMembers\": 1\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Check Payment Readiness",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/subscription/payment-readiness?planName=basic",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "subscription", "payment-readiness"],
+              "query": [
+                {
+                  "key": "planName",
+                  "value": "basic"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/subscription/payment-readiness?planName=basic",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "subscription", "payment-readiness"],
+                  "query": [
+                    {
+                      "key": "planName",
+                      "value": "basic"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"planName\": \"basic\",\n    \"planPrice\": 2000,\n    \"planCurrency\": \"NGN\",\n    \"hasSavedCards\": true,\n    \"defaultCard\": {\n      \"id\": \"64f8a1b2c3d4e5f6a7b8c9d3\",\n      \"last4\": \"1234\",\n      \"brand\": \"Visa\",\n      \"isDefault\": true\n    },\n    \"canUpgrade\": true,\n    \"message\": \"Ready to upgrade with saved card\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Upgrade Subscription",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"planName\": \"basic\",\n  \"cardId\": \"64f8a1b2c3d4e5f6a7b8c9d3\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/subscription/upgrade",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "subscription", "upgrade"]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"planName\": \"basic\",\n  \"cardId\": \"64f8a1b2c3d4e5f6a7b8c9d3\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/subscription/upgrade",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "subscription", "upgrade"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"isFree\": false,\n    \"message\": \"Subscription upgraded successfully\",\n    \"subscription\": \"basic\",\n    \"status\": \"active\",\n    \"payment\": {\n      \"success\": true,\n      \"reference\": \"CHARGE_64f8a1b2c3d4e5f6a7b8c9d0_1705312200000\",\n      \"amount\": 2000,\n      \"currency\": \"NGN\",\n      \"card\": {\n        \"last4\": \"1234\",\n        \"brand\": \"Visa\"\n      }\n    }\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Card Management",
+      "item": [
+        {
+          "name": "Initialize Card Save",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"callbackUrl\": \"https://yourapp.com/card-callback\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/card/save/initialize",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "card", "save", "initialize"]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"callbackUrl\": \"https://yourapp.com/card-callback\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/card/save/initialize",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "card", "save", "initialize"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"success\": true,\n    \"paymentUrl\": \"https://checkout.paystack.com/0x123456789\",\n    \"reference\": \"CARD_SAVE_64f8a1b2c3d4e5f6a7b8c9d0_1705312200000\",\n    \"amount\": 1,\n    \"currency\": \"NGN\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get All Cards",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/card/list",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "card", "list"]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/card/list",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "card", "list"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"success\": true,\n    \"cards\": [\n      {\n        \"id\": \"64f8a1b2c3d4e5f6a7b8c9d3\",\n        \"last4\": \"1234\",\n        \"brand\": \"Visa\",\n        \"cardType\": \"visa\",\n        \"expMonth\": \"12\",\n        \"expYear\": \"2025\",\n        \"bank\": \"GT Bank\",\n        \"isDefault\": true,\n        \"cardName\": \"My Card\",\n        \"createdAt\": \"2024-01-15T10:30:00.000Z\"\n      },\n      {\n        \"id\": \"64f8a1b2c3d4e5f6a7b8c9d4\",\n        \"last4\": \"5678\",\n        \"brand\": \"Mastercard\",\n        \"cardType\": \"mastercard\",\n        \"expMonth\": \"06\",\n        \"expYear\": \"2026\",\n        \"bank\": \"Access Bank\",\n        \"isDefault\": false,\n        \"cardName\": \"Business Card\",\n        \"createdAt\": \"2024-01-16T14:20:00.000Z\"\n      }\n    ]\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Set Default Card",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cardId\": \"64f8a1b2c3d4e5f6a7b8c9d4\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/card/default",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "card", "default"]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"cardId\": \"64f8a1b2c3d4e5f6a7b8c9d4\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/card/default",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "card", "default"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"success\": true,\n    \"message\": \"Default card updated successfully\",\n    \"card\": {\n      \"id\": \"64f8a1b2c3d4e5f6a7b8c9d4\",\n      \"last4\": \"5678\",\n      \"brand\": \"Mastercard\",\n      \"isDefault\": true\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Charge Saved Card",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 2000,\n  \"description\": \"Subscription payment\",\n  \"cardId\": \"64f8a1b2c3d4e5f6a7b8c9d3\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/card/charge",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "card", "charge"]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"amount\": 2000,\n  \"description\": \"Subscription payment\",\n  \"cardId\": \"64f8a1b2c3d4e5f6a7b8c9d3\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/card/charge",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "card", "charge"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"success\": true,\n    \"message\": \"Payment successful\",\n    \"reference\": \"CHARGE_64f8a1b2c3d4e5f6a7b8c9d0_1705312200000\",\n    \"amount\": 2000,\n    \"currency\": \"NGN\",\n    \"card\": {\n      \"last4\": \"1234\",\n      \"brand\": \"Visa\"\n    },\n    \"paymentDetails\": {\n      \"gateway\": \"paystack\",\n      \"status\": \"success\",\n      \"paidAt\": \"2024-01-15T10:30:00.000Z\"\n    }\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Invoice Management",
+      "item": [
+        {
+          "name": "Create Invoice",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer\": {\n    \"name\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"phone\": \"+2348012345678\",\n    \"address\": \"Lagos, Nigeria\"\n  },\n  \"items\": [\n    {\n      \"description\": \"Web Development Services\",\n      \"quantity\": 1,\n      \"price\": 50000,\n      \"unit\": \"project\"\n    },\n    {\n      \"description\": \"UI/UX Design\",\n      \"quantity\": 1,\n      \"price\": 25000,\n      \"unit\": \"project\"\n    }\n  ],\n  \"issueDate\": \"2024-01-15\",\n  \"dueDate\": \"2024-01-30\",\n  \"notes\": \"Thank you for your business!\",\n  \"terms\": \"Payment due within 15 days\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/invoice",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "invoice"]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"customer\": {\n    \"name\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"phone\": \"+2348012345678\",\n    \"address\": \"Lagos, Nigeria\"\n  },\n  \"items\": [\n    {\n      \"description\": \"Web Development Services\",\n      \"quantity\": 1,\n      \"price\": 50000,\n      \"unit\": \"project\"\n    },\n    {\n      \"description\": \"UI/UX Design\",\n      \"quantity\": 1,\n      \"price\": 25000,\n      \"unit\": \"project\"\n    }\n  ],\n  \"issueDate\": \"2024-01-15\",\n  \"dueDate\": \"2024-01-30\",\n  \"notes\": \"Thank you for your business!\",\n  \"terms\": \"Payment due within 15 days\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/invoice",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "invoice"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"_id\": \"64f8a1b2c3d4e5f6a7b8c9d5\",\n    \"invoiceNumber\": \"INV-2024-001\",\n    \"customer\": {\n      \"_id\": \"64f8a1b2c3d4e5f6a7b8c9d6\",\n      \"name\": \"John Doe\",\n      \"email\": \"john@example.com\",\n      \"phone\": \"+2348012345678\"\n    },\n    \"items\": [\n      {\n        \"description\": \"Web Development Services\",\n        \"quantity\": 1,\n        \"price\": 50000,\n        \"unit\": \"project\"\n      },\n      {\n        \"description\": \"UI/UX Design\",\n        \"quantity\": 1,\n        \"price\": 25000,\n        \"unit\": \"project\"\n      }\n    ],\n    \"subtotal\": 75000,\n    \"tax\": 5625,\n    \"taxRate\": 7.5,\n    \"total\": 80625,\n    \"currency\": \"NGN\",\n    \"country\": \"NG\",\n    \"status\": \"draft\",\n    \"issueDate\": \"2024-01-15T00:00:00.000Z\",\n    \"dueDate\": \"2024-01-30T00:00:00.000Z\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Share Invoice via WhatsApp",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerPhone\": \"+2348012345678\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/invoice/INV-2024-001/share-whatsapp",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "invoice", "INV-2024-001", "share-whatsapp"]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"customerPhone\": \"+2348012345678\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/invoice/INV-2024-001/share-whatsapp",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "invoice", "INV-2024-001", "share-whatsapp"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"success\": true,\n    \"whatsappLink\": \"https://wa.me/2348012345678?text=Invoice%20INV-2024-001\",\n    \"messageId\": \"msg_123456789\",\n    \"message\": \"WhatsApp message sent successfully\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Share PDF Invoice via WhatsApp",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerPhone\": \"+2348012345678\",\n  \"pdfUrl\": \"https://cloudinary.com/invoice_123.pdf\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/invoice/INV-2024-001/share-pdf-whatsapp",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "invoice", "INV-2024-001", "share-pdf-whatsapp"]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"customerPhone\": \"+2348012345678\",\n  \"pdfUrl\": \"https://cloudinary.com/invoice_123.pdf\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/invoice/INV-2024-001/share-pdf-whatsapp",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "invoice", "INV-2024-001", "share-pdf-whatsapp\"]"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"success\": true,\n    \"whatsappLink\": \"https://wa.me/2348012345678?text=Invoice%20INV-2024-001\",\n    \"messageId\": \"msg_123456789\",\n    \"message\": \"WhatsApp media message sent successfully\",\n    \"pdfSent\": true,\n    \"pdfUrl\": \"https://cloudinary.com/invoice_123.pdf\"\n  }\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
