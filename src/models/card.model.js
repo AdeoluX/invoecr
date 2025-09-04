@@ -75,6 +75,5 @@ cardSchema.pre("save", async function (next) {
 
 // Index for faster queries
 cardSchema.index({ entity: 1, isActive: 1 });
-cardSchema.index({ authorizationCode: 1 }, { unique: true });
 
 module.exports = mongoose.model("Card", cardSchema);

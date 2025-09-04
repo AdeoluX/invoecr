@@ -48,4 +48,24 @@ router.get(
   SubscriptionController.checkPaymentReadiness
 );
 
+// Subscription renewal routes
+router.post(
+  `${BASE}/renew`,
+  Authorization.authenticateToken,
+  SubscriptionController.renewSubscription
+);
+
+// Admin/cron job routes (for monitoring and processing renewals)
+router.get(
+  `${BASE}/renewal-status`,
+  Authorization.authenticateToken,
+  SubscriptionController.getSubscriptionsNeedingRenewal
+);
+
+router.post(
+  `${BASE}/process-renewals`,
+  Authorization.authenticateToken,
+  SubscriptionController.processAutomaticRenewals
+);
+
 module.exports = router;

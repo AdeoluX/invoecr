@@ -37,7 +37,7 @@ var entitySchema = new Schema(
     },
     type: {
       type: String,
-      enum: ["business", "staff"],
+      enum: ["business", "staff", "individual"],
       required: true,
     },
     // Nigeria-specific business fields

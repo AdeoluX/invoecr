@@ -9,4 +9,6 @@ const BASE = "/webhook";
 // Webhook endpoint - no authentication required (Paystack calls this)
 router.post(`${BASE}`, UtilsController.webhook);
 
+router.get(`${BASE}/callback`, UtilsController.callbackWebhook);
+
 module.exports = router;

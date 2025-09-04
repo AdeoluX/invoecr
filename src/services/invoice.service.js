@@ -45,6 +45,7 @@ class InvoiceService {
         entity: entity_id,
       });
       abortIf(!customer, httpStatus.BAD_REQUEST, "Error creating customer");
+      await SubscriptionService.updateUsage(entity_id, "customer", 1);
     }
 
     // Get entity details for Nigeria-specific defaults
@@ -64,7 +65,7 @@ class InvoiceService {
     // Calculate VAT if not provided
     if (data.tax === undefined && invoiceData.taxRate) {
       const subtotal = data.items.reduce(
-        (acc, item) => acc + item.price * item.quantity,
+        (acc, item) => acc + item.unitPrice * item.quantity,
         0
       );
       invoiceData.tax = (subtotal * invoiceData.taxRate) / 100;

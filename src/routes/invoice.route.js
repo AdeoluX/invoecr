@@ -36,6 +36,13 @@ router.get(
   Authorization.authenticateToken,
   InvoiceController.downloadInvoiceById
 );
+
+// Download invoice as PDF
+router.get(
+  `${BASE}/:code/pdf`,
+  Authorization.authenticateToken,
+  InvoiceController.downloadInvoicePDF
+);
 router.put(
   `${BASE}/:invoiceId`,
   validateReq(updateInvoiceSchema),

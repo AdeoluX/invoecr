@@ -30,14 +30,14 @@ class CardService {
         description: "Card verification for saving",
       };
 
-      const paymentResponse = await paystack.initializeTransaction(paymentData);
+      const paymentResponse = await paystack.initiatePayment(paymentData);
 
       if (paymentResponse.status) {
         return {
           success: true,
           paymentUrl: paymentResponse.data.authorization_url,
           reference: paymentResponse.data.reference,
-          amount: 1, // ₦1.00
+          amount: paymentData.amount, // ₦1.00
           currency: "NGN",
         };
       } else {
@@ -87,7 +87,7 @@ class CardService {
         const cardData = {
           entity: entityId,
           authorizationCode: authorization.authorization_code,
-          cardType: authorization.card_type,
+          cardType: authorization.card_type.trim(), // Trim any trailing spaces
           last4: authorization.last4,
           expMonth: authorization.exp_month,
           expYear: authorization.exp_year,
@@ -163,16 +163,14 @@ class CardService {
 
       const paystack = new PaystackPaymentGateway();
 
-      const chargeData = {
+      const chargeResponse = await paystack.chargeAuthorization({
         authorization_code: card.authorizationCode,
         email: email,
         amount: amount * 100, // Convert to kobo
         currency: "NGN",
         reference: `CHARGE_${entityId}_${Date.now()}`,
         description: description,
-      };
-
-      const chargeResponse = await paystack.chargeAuthorization(chargeData);
+      });
 
       if (chargeResponse.status) {
         return {
@@ -311,7 +309,7 @@ class CardService {
       const cardData = {
         entity: entityId,
         authorizationCode: authorization.authorization_code,
-        cardType: authorization.card_type,
+        cardType: authorization.card_type.trim(), // Trim any trailing spaces
         last4: authorization.last4,
         expMonth: authorization.exp_month,
         expYear: authorization.exp_year,

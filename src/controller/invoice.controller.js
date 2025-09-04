@@ -59,14 +59,46 @@ class InvoiceController {
     return successResponse(req, res, deletedInvoice);
   });
 
-  static downloadPdf = catchAsync(async (req, res, next) => {
-    const { invoiceId } = req.params;
-    const fileData = await InvoiceService.generateInvoicePDF(invoiceId, res);
-    const base64FileData = fileData.toString("base64");
-    // Provide the file name for the download
-    const fileName = `invoice_${invoiceId}.pdf`;
-    // Call the function to download the PDF
-    await downloadPdfFile(base64FileData, res, fileName);
+  // Download invoice as PDF
+  static downloadInvoicePDF = catchAsync(async (req, res, next) => {
+    const { code } = req.params;
+    const user = req.user;
+
+    try {
+      // Get invoice to verify ownership
+      const invoice = await InvoiceService.getInvoiceById(code, user.id);
+      if (!invoice) {
+        return res.status(404).json({
+          success: false,
+          message: "Invoice not found",
+        });
+      }
+
+      // Generate PDF with watermark based on subscription plan
+      const PDFService = require("../services/pdf.service");
+      const pdfBuffer = await PDFService.generateInvoicePDFBuffer(
+        invoice._id,
+        user.id
+      );
+
+      // Set response headers for PDF download
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename="invoice_${invoice.invoiceCode}.pdf"`
+      );
+      res.setHeader("Content-Length", pdfBuffer.length);
+
+      // Send PDF buffer
+      res.send(pdfBuffer);
+    } catch (error) {
+      console.error("PDF generation error:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Error generating PDF",
+        error: error.message,
+      });
+    }
   });
 
   // Share invoice via WhatsApp

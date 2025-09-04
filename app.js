@@ -3,7 +3,7 @@ const express = require("express");
 const app = express();
 
 const ApiError = require("./src/utils/ApiError");
-const httpStatus = require("http-status");
+const httpStatus = require("http-status").default;
 const cors = require("cors");
 const {
   authRoute,
@@ -40,6 +40,19 @@ app.get("/", (req, res) => {
   res.send("Server is up and running!");
 });
 
+// Handle common browser requests
+app.get("/favicon.ico", (req, res) => {
+  res.status(204).end(); // No content response
+});
+
+app.get("/robots.txt", (req, res) => {
+  res.status(204).end(); // No content response
+});
+
+app.get("/sitemap.xml", (req, res) => {
+  res.status(204).end(); // No content response
+});
+
 // Routes
 app.use("/api/v1", authRoute);
 app.use("/api/v1", invoiceRoute);
@@ -51,7 +64,14 @@ app.use("/api/v1", cardRoute);
 
 // Catch-all for 404 errors
 app.use((req, res, next) => {
-  console.log(`Endpoint not found: ${req.method} ${req.originalUrl}`);
+  // Filter out common browser requests that aren't actual API errors
+  const ignoredPaths = ["/favicon.ico", "/robots.txt", "/sitemap.xml"];
+  const isIgnoredPath = ignoredPaths.some((path) => req.originalUrl === path);
+
+  if (!isIgnoredPath) {
+    console.log(`Endpoint not found: ${req.method} ${req.originalUrl}`);
+  }
+
   next(new ApiError(httpStatus.NOT_FOUND, "Not found", true));
 });
 
@@ -59,15 +79,23 @@ app.use((req, res, next) => {
 app.use(errorConverter);
 app.use(errorHandler);
 
-// Start the server after connecting to the database
+// Connect to database
 const startServer = async () => {
   try {
-    dbConnect;
+    await dbConnect();
     console.log("Database connected successfully");
-    const PORT = process.env.PORT || 3000;
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-    });
+
+    // Initialize subscription renewal cron jobs
+    try {
+      const { subscriptionCronJobs } = require("./src/utils/subscription-cron");
+      subscriptionCronJobs.init();
+    } catch (cronError) {
+      console.warn(
+        "⚠️ Subscription cron jobs not initialized:",
+        cronError.message
+      );
+      console.log("💡 Install node-cron: npm install node-cron");
+    }
   } catch (error) {
     console.error("Failed to connect to database:", error.message);
     process.exit(1);

@@ -199,10 +199,13 @@ class TermiiService {
 
     message += `*Items:*\n`;
     invoice.items.forEach((item, index) => {
-      const itemTotal = this.formatCurrency(item.price * item.quantity, "NGN");
+      const itemTotal = this.formatCurrency(
+        item.unitPrice * item.quantity,
+        "NGN"
+      );
       message += `${index + 1}. ${item.description} - ${
         item.quantity
-      } × ${currencySymbol}${item.price.toLocaleString(
+      } × ${currencySymbol}${item.unitPrice.toLocaleString(
         "en-NG"
       )} = ${itemTotal}\n`;
     });

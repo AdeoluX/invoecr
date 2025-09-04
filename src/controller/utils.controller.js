@@ -17,7 +17,7 @@ class UtilsController {
   });
 
   static webhook = catchAsync(async (req, res, next) => {
-    const data = req.body;
+    const data = req.body || req.query;
     const signature = req.headers["x-paystack-signature"];
 
     try {
@@ -35,6 +35,12 @@ class UtilsController {
         message: error.message,
       });
     }
+  });
+
+  static callbackWebhook = catchAsync(async (req, res, next) => {
+    const data = req.query;
+    const result = await UtilsService.callbackWebhook(data);
+    return successResponse(req, res, result, "Webhook processed successfully");
   });
 }
 

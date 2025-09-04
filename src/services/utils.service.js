@@ -23,6 +23,30 @@ class UtilsService {
     return verifyBank.data;
   };
 
+  static callbackWebhook = async (data) => {
+    console.log("🔄 Callback webhook received:", data);
+    const paystack = new PaystackPaymentGateway();
+    const verification = await paystack.verifyTransaction(data.reference);
+    if (!verification.success) {
+      console.error("Payment verification failed:", verification.message);
+      return {};
+    }
+    //save the card
+    const cardSaveResult = await CardService.saveCardFromWebhook(
+      verification.data.metadata.entityId,
+      verification.data.authorization
+    );
+    if (!cardSaveResult.success) {
+      console.error("Card save failed:", cardSaveResult.message);
+      return {};
+    }
+    return {
+      success: true,
+      message: "Payment verification successful",
+      data: verification.data,
+    };
+  };
+
   static webhook = async (object, signature) => {
     try {
       const paystack = new PaystackPaymentGateway();

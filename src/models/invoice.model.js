@@ -68,7 +68,7 @@ var invoiceSchema = new mongoose.Schema(
 // Pre-save hook
 invoiceSchema.pre("save", function (next) {
   this.subtotal = this.items.reduce(function (acc, item) {
-    return acc + item.price * item.quantity;
+    return acc + item.unitPrice * item.quantity;
   }, 0);
   this.total = this.subtotal + this.tax;
 
@@ -80,7 +80,7 @@ invoiceSchema.pre("findOneAndUpdate", function (next) {
   var update = this.getUpdate();
   if (update.items) {
     var subtotal = update.items.reduce(function (acc, item) {
-      return acc + item.price * item.quantity;
+      return acc + item.unitPrice * item.quantity;
     }, 0);
     update.subtotal = subtotal;
     update.total = subtotal + (update.tax || 0);

@@ -9,6 +9,14 @@ class BaseRepository {
       const document = new this.model(data);
       return await document.save();
     } catch (error) {
+      // Handle duplicate key errors specifically
+      if (error.code === 11000) {
+        const duplicateField = Object.keys(error.keyValue || {})[0];
+        const duplicateValue = error.keyValue?.[duplicateField];
+        throw new Error(
+          `${duplicateField} '${duplicateValue}' is already in use. Please use a different ${duplicateField}.`
+        );
+      }
       throw new Error(`Create Error: ${error.message}`);
     }
   }

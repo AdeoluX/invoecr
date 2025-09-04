@@ -130,6 +130,57 @@ class SubscriptionController {
         : "Please save a card first to upgrade",
     });
   });
+
+  // Renew subscription
+  static renewSubscription = catchAsync(async (req, res, next) => {
+    const user = req.user;
+    const { cardId } = req.body; // Optional: specific card to use
+
+    const result = await SubscriptionService.renewSubscription(
+      user.id,
+      user.email,
+      cardId
+    );
+
+    if (result.success) {
+      return successResponse(req, res, result);
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: result.message,
+        payment: result.payment,
+      });
+    }
+  });
+
+  // Get subscriptions needing renewal (for admin/cron monitoring)
+  static getSubscriptionsNeedingRenewal = catchAsync(async (req, res, next) => {
+    const { daysAhead = 7 } = req.query;
+
+    const entities = await SubscriptionService.getSubscriptionsNeedingRenewal(
+      parseInt(daysAhead)
+    );
+
+    return successResponse(req, res, {
+      message: "Subscriptions needing renewal retrieved",
+      count: entities.length,
+      entities,
+    });
+  });
+
+  // Process automatic renewals (for admin/cron jobs)
+  static processAutomaticRenewals = catchAsync(async (req, res, next) => {
+    const { daysAhead = 7 } = req.query;
+
+    const results = await SubscriptionService.processAutomaticRenewals(
+      parseInt(daysAhead)
+    );
+
+    return successResponse(req, res, {
+      message: "Automatic renewals processed",
+      results,
+    });
+  });
 }
 
 module.exports = {

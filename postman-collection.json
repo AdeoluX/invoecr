@@ -27,14 +27,7 @@
     }
   ],
   "auth": {
-    "type": "bearer",
-    "bearer": [
-      {
-        "key": "token",
-        "value": "{{authToken}}",
-        "type": "string"
-      }
-    ]
+    "type": "noauth"
   },
   "item": [
     {
@@ -224,6 +217,16 @@
           "request": {
             "method": "GET",
             "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
             "url": {
               "raw": "{{baseUrl}}/api/v1/subscription/current",
               "host": ["{{baseUrl}}"],
@@ -315,6 +318,16 @@
                 "value": "application/json"
               }
             ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
             "body": {
               "mode": "raw",
               "raw": "{\n  \"planName\": \"basic\",\n  \"cardId\": \"64f8a1b2c3d4e5f6a7b8c9d3\"\n}"
@@ -354,6 +367,197 @@
               "body": "{\n  \"success\": true,\n  \"data\": {\n    \"isFree\": false,\n    \"message\": \"Subscription upgraded successfully\",\n    \"subscription\": \"basic\",\n    \"status\": \"active\",\n    \"payment\": {\n      \"success\": true,\n      \"reference\": \"CHARGE_64f8a1b2c3d4e5f6a7b8c9d0_1705312200000\",\n      \"amount\": 2000,\n      \"currency\": \"NGN\",\n      \"card\": {\n        \"last4\": \"1234\",\n        \"brand\": \"Visa\"\n      }\n    }\n  }\n}"
             }
           ]
+        },
+        {
+          "name": "Renew Subscription",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cardId\": \"64f8a1b2c3d4e5f6a7b8c9d3\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/subscription/renew",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "subscription", "renew"]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"cardId\": \"64f8a1b2c3d4e5f6a7b8c9d3\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/subscription/renew",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "subscription", "renew"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"isFree\": false,\n    \"message\": \"Subscription renewed successfully\",\n    \"subscription\": \"basic\",\n    \"status\": \"active\",\n    \"payment\": {\n      \"success\": true,\n      \"reference\": \"CHARGE_64f8a1b2c3d4e5f6a7b8c9d0_1705312200000\",\n      \"amount\": 2000,\n      \"currency\": \"NGN\",\n      \"card\": {\n        \"last4\": \"1234\",\n        \"brand\": \"Visa\"\n      }\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Renewal Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/subscription/renewal-status?daysAhead=7",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "subscription", "renewal-status"],
+              "query": [
+                {
+                  "key": "daysAhead",
+                  "value": "7"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/subscription/renewal-status?daysAhead=7",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "subscription", "renewal-status"],
+                  "query": [
+                    {
+                      "key": "daysAhead",
+                      "value": "7"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"message\": \"Subscriptions needing renewal retrieved\",\n    \"count\": 2,\n    \"entities\": [\n      {\n        \"entityId\": \"64f8a1b2c3d4e5f6a7b8c9d0\",\n        \"email\": \"tayo@business.com\",\n        \"currentPlan\": \"basic\",\n        \"currentPlanPrice\": 2000,\n        \"expiryDate\": \"2024-02-15T10:30:00.000Z\",\n        \"daysUntilExpiry\": 3\n      },\n      {\n        \"entityId\": \"64f8a1b2c3d4e5f6a7b8c9d1\",\n        \"email\": \"business@example.com\",\n        \"currentPlan\": \"premium\",\n        \"currentPlanPrice\": 5000,\n        \"expiryDate\": \"2024-02-18T14:20:00.000Z\",\n        \"daysUntilExpiry\": 6\n      }\n    ]\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Process Automatic Renewals",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"daysAhead\": 7\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/subscription/process-renewals?daysAhead=7",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "subscription", "process-renewals"],
+              "query": [
+                {
+                  "key": "daysAhead",
+                  "value": "7"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"daysAhead\": 7\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/subscription/process-renewals?daysAhead=7",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "subscription", "process-renewals"],
+                  "query": [
+                    {
+                      "key": "daysAhead",
+                      "value": "7"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"message\": \"Automatic renewals processed\",\n    \"results\": {\n      \"processed\": 2,\n      \"successful\": 1,\n      \"failed\": 1,\n      \"errors\": [\n        {\n          \"entityId\": \"64f8a1b2c3d4e5f6a7b8c9d1\",\n          \"error\": \"Payment failed: No default card found\"\n        }\n      ]\n    }\n  }\n}"
+            }
+          ]
         }
       ]
     },
@@ -370,6 +574,16 @@
                 "value": "application/json"
               }
             ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
             "body": {
               "mode": "raw",
               "raw": "{\n  \"callbackUrl\": \"https://yourapp.com/card-callback\"\n}"
@@ -562,6 +776,16 @@
                 "value": "application/json"
               }
             ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
             "body": {
               "mode": "raw",
               "raw": "{\n  \"customer\": {\n    \"name\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"phone\": \"+2348012345678\",\n    \"address\": \"Lagos, Nigeria\"\n  },\n  \"items\": [\n    {\n      \"description\": \"Web Development Services\",\n      \"quantity\": 1,\n      \"price\": 50000,\n      \"unit\": \"project\"\n    },\n    {\n      \"description\": \"UI/UX Design\",\n      \"quantity\": 1,\n      \"price\": 25000,\n      \"unit\": \"project\"\n    }\n  ],\n  \"issueDate\": \"2024-01-15\",\n  \"dueDate\": \"2024-01-30\",\n  \"notes\": \"Thank you for your business!\",\n  \"terms\": \"Payment due within 15 days\"\n}"
@@ -635,7 +859,13 @@
                 "url": {
                   "raw": "{{baseUrl}}/api/v1/invoice/INV-2024-001/share-whatsapp",
                   "host": ["{{baseUrl}}"],
-                  "path": ["api", "v1", "invoice", "INV-2024-001", "share-whatsapp"]
+                  "path": [
+                    "api",
+                    "v1",
+                    "invoice",
+                    "INV-2024-001",
+                    "share-whatsapp"
+                  ]
                 }
               },
               "status": "OK",
@@ -669,7 +899,13 @@
             "url": {
               "raw": "{{baseUrl}}/api/v1/invoice/INV-2024-001/share-pdf-whatsapp",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "invoice", "INV-2024-001", "share-pdf-whatsapp"]
+              "path": [
+                "api",
+                "v1",
+                "invoice",
+                "INV-2024-001",
+                "share-pdf-whatsapp"
+              ]
             }
           },
           "response": [
@@ -685,7 +921,13 @@
                 "url": {
                   "raw": "{{baseUrl}}/api/v1/invoice/INV-2024-001/share-pdf-whatsapp",
                   "host": ["{{baseUrl}}"],
-                  "path": ["api", "v1", "invoice", "INV-2024-001", "share-pdf-whatsapp\"]"
+                  "path": [
+                    "api",
+                    "v1",
+                    "invoice",
+                    "INV-2024-001",
+                    "share-pdf-whatsapp"
+                  ]
                 }
               },
               "status": "OK",
@@ -699,6 +941,57 @@
               ],
               "cookie": [],
               "body": "{\n  \"success\": true,\n  \"data\": {\n    \"success\": true,\n    \"whatsappLink\": \"https://wa.me/2348012345678?text=Invoice%20INV-2024-001\",\n    \"messageId\": \"msg_123456789\",\n    \"message\": \"WhatsApp media message sent successfully\",\n    \"pdfSent\": true,\n    \"pdfUrl\": \"https://cloudinary.com/invoice_123.pdf\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Download Invoice as PDF",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/invoice/INV-2024-001/pdf",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "invoice", "INV-2024-001", "pdf"]
+            }
+          },
+          "response": [
+            {
+              "name": "PDF Download Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/invoice/INV-2024-001/pdf",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "invoice", "INV-2024-001", "pdf"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/pdf"
+                },
+                {
+                  "key": "Content-Disposition",
+                  "value": "attachment; filename=\"invoice_INV-2024-001.pdf\""
+                }
+              ],
+              "cookie": [],
+              "body": "PDF binary data will be returned for download"
             }
           ]
         }
