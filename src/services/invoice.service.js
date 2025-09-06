@@ -406,7 +406,7 @@ class InvoiceService {
     );
     abortIf(!invoice, httpStatus.NOT_FOUND, "Invoice not found");
     abortIf(
-      ["paid"].includes(invoice.status),
+      ["paid", "draft"].includes(invoice.status),
       httpStatus.BAD_REQUEST,
       "Invoice is in draft status"
     );

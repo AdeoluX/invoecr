@@ -53,12 +53,12 @@ const createInvoiceSchema = {
 
 const updateInvoiceSchema = {
   body: Joi.object()
-    .required()
+    .optional()
     .keys({
       customerId: Joi.string().optional(),
       customer: Joi.object()
         .keys({
-          name: Joi.string().optional(), // Optional for update
+          name: Joi.string().optional(),
           email: Joi.string().email().optional(),
           phone: Joi.string().optional(),
         })
@@ -66,7 +66,7 @@ const updateInvoiceSchema = {
       items: Joi.array()
         .items(
           Joi.object().keys({
-            description: Joi.string().optional(), // Optional for update
+            description: Joi.string().optional(),
             quantity: Joi.number().min(1).optional(),
             unitPrice: Joi.number().min(0).optional(),
           })
@@ -74,23 +74,24 @@ const updateInvoiceSchema = {
         .optional(),
       issueDate: Joi.date().optional(),
       dueDate: Joi.date().optional(),
-      status: Joi.string().valid("draft", "sent", "paid", "overdue").optional(),
+      status: Joi.string()
+        .valid("draft", "sent", "paid", "overdue", "published")
+        .optional(),
       notes: Joi.string().optional().allow(""),
       terms: Joi.string().optional().allow(""),
       subtotal: Joi.number().min(0).optional(),
       tax: Joi.number().min(0).optional(),
-    })
-    .or("customerId", "customer"), // At least one of customerId or customer must be provided if either is present
+    }),
   files: Joi.object()
     .optional()
     .keys({
       file: Joi.object()
         .optional()
         .keys({
-          mimetype: Joi.string().valid("image/jpeg", "image/png").required(),
+          mimetype: Joi.string().valid("image/jpeg", "image/png").optional(),
           size: Joi.number()
             .max(3 * 1024 * 1024)
-            .required(), // 5MB limit
+            .optional(),
         }),
     })
     .optional(),

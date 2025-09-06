@@ -22,10 +22,7 @@ router.get(
   Authorization.authenticateToken,
   InvoiceController.getAllInvoices
 );
-router.post(
-  `${BASE}/:code/initiate-payment`,
-  InvoiceController.initiatePayment
-);
+router.get(`${BASE}/:code/initiate-payment`, InvoiceController.initiatePayment);
 router.get(
   `${BASE}/:code`,
   Authorization.authenticateToken,
@@ -46,6 +43,7 @@ router.get(
 router.put(
   `${BASE}/:invoiceId`,
   validateReq(updateInvoiceSchema),
+  Authorization.authenticateToken,
   InvoiceController.updateInvoice
 );
 router.delete(`${BASE}/:invoiceId`, InvoiceController.deleteInvoice);

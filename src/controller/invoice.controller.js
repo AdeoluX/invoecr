@@ -1,7 +1,9 @@
 const catchAsync = require("../utils/catchAsync");
 const { InvoiceService } = require("../services");
-const { successResponse } = require("../utils/responder");
+const { successResponse, redirect } = require("../utils/responder");
 const httpStatus = require("http-status");
+const moment = require("moment");
+const invoiceRepo = require("../repo/invoice.repo");
 
 class InvoiceController {
   // Create a new invoice
@@ -23,7 +25,7 @@ class InvoiceController {
   static initiatePayment = catchAsync(async (req, res, next) => {
     const { code } = req.params;
     const invoices = await InvoiceService.initiatePayment(code);
-    return successResponse(req, res, invoices);
+    return redirect(res, invoices.data.authorization_url);
   });
 
   // Get a single invoice by ID
@@ -44,9 +46,12 @@ class InvoiceController {
   // Update an invoice by ID
   static updateInvoice = catchAsync(async (req, res, next) => {
     const { invoiceId } = req.params;
+    const invoice = await invoiceRepo.findOne({
+      query: { invoiceNumber: invoiceId },
+    });
     const updatedData = req.body;
     const updatedInvoice = await InvoiceService.updateInvoice(
-      invoiceId,
+      invoice._id,
       updatedData
     );
     return successResponse(req, res, updatedInvoice);
@@ -85,7 +90,9 @@ class InvoiceController {
       res.setHeader("Content-Type", "application/pdf");
       res.setHeader(
         "Content-Disposition",
-        `attachment; filename="invoice_${invoice.invoiceCode}.pdf"`
+        `attachment; filename="invoice_${
+          invoice.invoiceNumber
+        }_${moment().format("DD-MM-YYYY")}.pdf"`
       );
       res.setHeader("Content-Length", pdfBuffer.length);
 
