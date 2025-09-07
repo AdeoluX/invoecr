@@ -124,7 +124,7 @@ class PDFService {
       .text(`Currency: ${invoice.currency || "NGN"}`, 40, 70);
 
     // Invoice details
-    const detailsX = 350;
+    const detailsX = 370;
     doc
       .font("Helvetica")
       .fontSize(12)
