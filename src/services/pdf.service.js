@@ -153,18 +153,25 @@ class PDFService {
         80
       );
 
-    // Status badge
-    const status = (invoice.status || "draft").toLowerCase();
+    // Status badge - show both lifecycle and payment status
+    const lifecycleStatus = (invoice.status || "draft").toLowerCase();
+    const paymentStatus = (invoice.paymentStatus || "unpaid").toLowerCase();
+
+    // Use payment status for color if invoice is published, otherwise use lifecycle status
+    const displayStatus =
+      lifecycleStatus === "published" ? paymentStatus : lifecycleStatus;
 
     // Draw status badge background
     doc.rect(detailsX, 100, 80, 25);
-    doc.fillAndStroke(this.getStatusColor(status), "#333333");
+    doc.fillAndStroke(this.getStatusColor(displayStatus), "#333333");
 
     // Add status text
     doc.font("Helvetica-Bold");
     doc.fontSize(11);
     doc.fillColor("#FFFFFF");
-    doc.text(status.toUpperCase(), detailsX + 40, 108, { align: "center" });
+    doc.text(displayStatus.toUpperCase(), detailsX + 40, 108, {
+      align: "center",
+    });
   }
 
   /**
@@ -511,10 +518,16 @@ class PDFService {
    */
   static getStatusColor(status) {
     const colors = {
+      // Lifecycle statuses
       draft: "#6B7280",
       sent: "#0EA5E9",
+      published: "#3B82F6",
+      // Payment statuses
+      unpaid: "#6B7280",
       paid: "#22C55E",
       overdue: "#EF4444",
+      "partially-paid": "#F59E0B",
+      // Legacy statuses (for backward compatibility)
       cancelled: "#6B7280",
       partially_paid: "#F59E0B",
     };

@@ -406,9 +406,9 @@ class InvoiceService {
     );
     abortIf(!invoice, httpStatus.NOT_FOUND, "Invoice not found");
     abortIf(
-      ["paid", "draft"].includes(invoice.status),
+      invoice.status === "draft" || invoice.paymentStatus === "paid",
       httpStatus.BAD_REQUEST,
-      "Invoice is in draft status"
+      "Invoice is in draft status or already paid"
     );
     let reference = crypto.randomUUID().split("-").join("").slice(0, 17);
     const getSubAccount = await bankRepo.findOne({

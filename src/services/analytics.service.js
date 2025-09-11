@@ -12,6 +12,33 @@ class AnalyticsService {
   static async getInvoiceAnalytics(entityId, filters = {}) {
     const { startDate, endDate } = filters;
 
+    // Calculate month-on-month comparison dates
+    const now = new Date();
+    const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const currentMonthEnd = new Date(
+      now.getFullYear(),
+      now.getMonth() + 1,
+      0,
+      23,
+      59,
+      59,
+      999
+    );
+    const previousMonthStart = new Date(
+      now.getFullYear(),
+      now.getMonth() - 1,
+      1
+    );
+    const previousMonthEnd = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      0,
+      23,
+      59,
+      59,
+      999
+    );
+
     const matchStage = {
       entity: new mongoose.Types.ObjectId(entityId),
     };
@@ -33,11 +60,75 @@ class AnalyticsService {
       {
         $group: {
           _id: null,
+          // Total counts
           totalInvoices: { $sum: 1 },
+          totalPublishedInvoices: {
+            $sum: {
+              $cond: [{ $eq: ["$status", "published"] }, 1, 0],
+            },
+          },
+          totalUnpaidPublishedInvoices: {
+            $sum: {
+              $cond: [
+                {
+                  $and: [
+                    { $eq: ["$status", "published"] },
+                    { $ne: ["$paymentStatus", "paid"] },
+                  ],
+                },
+                1,
+                0,
+              ],
+            },
+          },
+          // Amount calculations
           totalAmount: { $sum: "$total" },
+          totalSubtotal: { $sum: "$subtotal" },
+          // Published invoice amounts
+          publishedPaidSubtotal: {
+            $sum: {
+              $cond: [
+                {
+                  $and: [
+                    { $eq: ["$status", "published"] },
+                    { $eq: ["$paymentStatus", "paid"] },
+                  ],
+                },
+                "$subtotal",
+                0,
+              ],
+            },
+          },
+          publishedUnpaidSubtotal: {
+            $sum: {
+              $cond: [
+                {
+                  $and: [
+                    { $eq: ["$status", "published"] },
+                    { $ne: ["$paymentStatus", "paid"] },
+                  ],
+                },
+                "$subtotal",
+                0,
+              ],
+            },
+          },
+          // Total published invoices (both paid and unpaid)
+          totalPublishedSubtotal: {
+            $sum: {
+              $cond: [{ $eq: ["$status", "published"] }, "$subtotal", 0],
+            },
+          },
+          // All paid invoices subtotal
+          allPaidSubtotal: {
+            $sum: {
+              $cond: [{ $eq: ["$paymentStatus", "paid"] }, "$subtotal", 0],
+            },
+          },
+          // Legacy fields for backward compatibility
           paidAmount: {
             $sum: {
-              $cond: [{ $eq: ["$status", "paid"] }, "$total", 0],
+              $cond: [{ $eq: ["$paymentStatus", "paid"] }, "$total", 0],
             },
           },
           pendingAmount: {
@@ -47,7 +138,7 @@ class AnalyticsService {
           },
           overdueAmount: {
             $sum: {
-              $cond: [{ $eq: ["$status", "overdue"] }, "$total", 0],
+              $cond: [{ $eq: ["$paymentStatus", "overdue"] }, "$total", 0],
             },
           },
           whatsappShares: {
@@ -62,14 +153,52 @@ class AnalyticsService {
     const analytics = await invoiceRepository.aggregate(pipeline);
     const result = analytics[0] || {
       totalInvoices: 0,
+      totalPublishedInvoices: 0,
+      totalUnpaidPublishedInvoices: 0,
       totalAmount: 0,
+      totalSubtotal: 0,
+      publishedPaidSubtotal: 0,
+      publishedUnpaidSubtotal: 0,
+      totalPublishedSubtotal: 0,
+      allPaidSubtotal: 0,
       paidAmount: 0,
       pendingAmount: 0,
       overdueAmount: 0,
       whatsappShares: 0,
     };
 
-    // Calculate percentages
+    // Calculate margin as percentage of published invoices that have been paid
+    result.margin =
+      result.totalPublishedSubtotal > 0
+        ? (result.publishedPaidSubtotal / result.totalPublishedSubtotal) * 100
+        : 0;
+    result.marginAmount =
+      result.publishedPaidSubtotal - result.publishedUnpaidSubtotal; // Keep the raw amount for reference
+
+    // Calculate month-on-month percentage increase for allPaidSubtotal
+    const currentMonthPaidSubtotal = await this.getMonthlyPaidSubtotal(
+      entityId,
+      currentMonthStart,
+      currentMonthEnd
+    );
+    const previousMonthPaidSubtotal = await this.getMonthlyPaidSubtotal(
+      entityId,
+      previousMonthStart,
+      previousMonthEnd
+    );
+
+    result.monthOnMonthIncrease =
+      previousMonthPaidSubtotal > 0
+        ? ((currentMonthPaidSubtotal - previousMonthPaidSubtotal) /
+            previousMonthPaidSubtotal) *
+          100
+        : currentMonthPaidSubtotal > 0
+        ? 100
+        : 0;
+    result.currentMonthPaidSubtotal = currentMonthPaidSubtotal;
+    result.previousMonthPaidSubtotal = previousMonthPaidSubtotal;
+
+    // Calculate percentages for backward compatibility
     result.paidPercentage =
       result.totalAmount > 0
         ? (result.paidAmount / result.totalAmount) * 100
@@ -84,6 +213,37 @@ class AnalyticsService {
         : 0;
 
     return result;
+  }
+
+  /**
+   * Get monthly paid subtotal for a specific date range
+   * @param {string} entityId - Business entity ID
+   * @param {Date} startDate - Start date
+   * @param {Date} endDate - End date
+   * @returns {Promise<number>} Monthly paid subtotal
+   */
+  static async getMonthlyPaidSubtotal(entityId, startDate, endDate) {
+    const pipeline = [
+      {
+        $match: {
+          entity: new mongoose.Types.ObjectId(entityId),
+          paymentStatus: "paid",
+          updatedAt: {
+            $gte: startDate,
+            $lte: endDate,
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalPaidSubtotal: { $sum: "$subtotal" },
+        },
+      },
+    ];
+
+    const result = await invoiceRepository.aggregate(pipeline);
+    return result[0]?.totalPaidSubtotal || 0;
   }
 
   /**
@@ -190,7 +350,7 @@ class AnalyticsService {
           totalSharedAmount: { $sum: "$total" },
           paidAfterShare: {
             $sum: {
-              $cond: [{ $eq: ["$status", "paid"] }, 1, 0],
+              $cond: [{ $eq: ["$paymentStatus", "paid"] }, 1, 0],
             },
           },
         },

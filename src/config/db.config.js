@@ -14,10 +14,10 @@ const dbConnect = async () => {
     console.log(`MongoDB Connected: ${conn.connection.host}`);
 
     // Seed subscription plans after successful connection
-    await seedSubscriptionPlans();
+    // await seedSubscriptionPlans();
 
     // Migrate existing entities to have subscription plans
-    await migrateSubscriptions();
+    // await migrateSubscriptions();
   } catch (error) {
     console.error("Error connecting to database:", error);
     process.exit(1);

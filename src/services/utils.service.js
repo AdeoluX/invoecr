@@ -188,12 +188,12 @@ class UtilsService {
       });
 
       const _in = await invoiceRepo.findById(transaction.invoice);
-      let status;
-      if (_in.total > transaction.amount) status = "partially-paid";
-      if (_in.total === transaction.amount) status = "paid";
+      let paymentStatus;
+      if (_in.total > transaction.amount) paymentStatus = "partially-paid";
+      if (_in.total === transaction.amount) paymentStatus = "paid";
 
       const invoice = await invoiceRepo.update(transaction.invoice, {
-        status,
+        paymentStatus,
       });
 
       console.log("✅ Invoice payment processed successfully");
