@@ -17,10 +17,17 @@ router.post(
   Authorization.authenticateToken,
   InvoiceController.createInvoice
 );
+
 router.get(
   `${BASE}`,
   Authorization.authenticateToken,
   InvoiceController.getAllInvoices
+);
+// Get dashboard summary
+router.get(
+  `${BASE}/dashboard`,
+  Authorization.authenticateToken,
+  InvoiceController.getDashboardSummary
 );
 // Get invoice analytics
 router.get(
@@ -69,13 +76,6 @@ router.post(
   `${BASE}/:code/share-pdf-whatsapp`,
   Authorization.authenticateToken,
   InvoiceController.sharePDFInvoiceViaWhatsApp
-);
-
-// Get dashboard summary
-router.get(
-  `${BASE}/dashboard`,
-  Authorization.authenticateToken,
-  InvoiceController.getDashboardSummary
 );
 
 module.exports = router;

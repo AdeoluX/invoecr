@@ -6,6 +6,7 @@ const TermiiService = require("./termii.service");
 const AnalyticsService = require("./analytics.service");
 const SubscriptionService = require("./subscription.service");
 const CardService = require("./card.service");
+const { CustomerService } = require("./customer.service");
 
 module.exports = {
   AuthService,
@@ -16,4 +17,5 @@ module.exports = {
   AnalyticsService,
   SubscriptionService,
   CardService,
+  CustomerService,
 };

@@ -30,13 +30,14 @@ class InvoiceService {
 
     let customer;
     abortIf(
-      !data.customer && !data.customerId,
+      !data.customer && !data.customerId && !data.customer_id,
       httpStatus.BAD_REQUEST,
       "Customer is required"
     );
-    if (data.customerId) {
+    let customerId = data.customerId || data.customer_id;
+    if (customerId) {
       customer = await customerRepository.findOne({
-        query: { _id: data.customerId },
+        query: { _id: customerId },
       });
       abortIf(!customer, httpStatus.NOT_FOUND, "Customer not found");
     } else if (data.customer) {

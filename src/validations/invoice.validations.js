@@ -35,7 +35,7 @@ const createInvoiceSchema = {
       subtotal: Joi.number().required().min(0),
       tax: Joi.number().optional().min(0).default(0),
     })
-    .xor("customerId", "customer"),
+    .xor("customer_id", "customer"),
   files: Joi.object()
     .optional()
     .keys({

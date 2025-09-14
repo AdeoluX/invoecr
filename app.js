@@ -13,6 +13,7 @@ const {
   webHookRoute,
   subscriptionRoute,
   cardRoute,
+  customerRoute,
 } = require("./src/routes");
 const { errorConverter, errorHandler } = require("./src/middleware/error");
 const fileUpload = require("express-fileupload");
@@ -61,6 +62,7 @@ app.use("/api/v1", entityRoute);
 app.use("/api/v1", webHookRoute);
 app.use("/api/v1", subscriptionRoute);
 app.use("/api/v1", cardRoute);
+app.use("/api/v1", customerRoute);
 
 // Catch-all for 404 errors
 app.use((req, res, next) => {

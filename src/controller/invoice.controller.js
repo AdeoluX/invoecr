@@ -67,6 +67,7 @@ class InvoiceController {
   // Download invoice as PDF
   static downloadInvoicePDF = catchAsync(async (req, res, next) => {
     const { code } = req.params;
+    const { preview = false } = req.query; // Add preview parameter
     const user = req.user;
 
     try {
@@ -86,15 +87,28 @@ class InvoiceController {
         user.id
       );
 
-      // Set response headers for PDF download
+      // Set response headers for PDF
       res.setHeader("Content-Type", "application/pdf");
-      res.setHeader(
-        "Content-Disposition",
-        `attachment; filename="invoice_${
-          invoice.invoiceNumber
-        }_${moment().format("DD-MM-YYYY")}.pdf"`
-      );
       res.setHeader("Content-Length", pdfBuffer.length);
+
+      // Set Content-Disposition based on preview parameter
+      if (preview === "true" || preview === true) {
+        // For preview - display inline in browser
+        res.setHeader(
+          "Content-Disposition",
+          `inline; filename="invoice_${invoice.invoiceNumber}_${moment().format(
+            "DD-MM-YYYY"
+          )}.pdf"`
+        );
+      } else {
+        // For download - force download
+        res.setHeader(
+          "Content-Disposition",
+          `attachment; filename="invoice_${
+            invoice.invoiceNumber
+          }_${moment().format("DD-MM-YYYY")}.pdf"`
+        );
+      }
 
       // Send PDF buffer
       res.send(pdfBuffer);

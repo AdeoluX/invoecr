@@ -5,6 +5,7 @@ const entityRoute = require("./entity.route");
 const webHookRoute = require("./webhook.route");
 const subscriptionRoute = require("./subscription.route");
 const cardRoute = require("./card.route");
+const customerRoute = require("./customer.route");
 
 module.exports = {
   authRoute,
@@ -14,4 +15,5 @@ module.exports = {
   webHookRoute,
   subscriptionRoute,
   cardRoute,
+  customerRoute,
 };

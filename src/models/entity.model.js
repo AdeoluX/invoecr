@@ -98,6 +98,7 @@ var entitySchema = new Schema(
     customersCreated: { type: Number, default: 0 },
     teamMembersCount: { type: Number, default: 1 },
     logo: String,
+    signature: String,
     address: String,
     resetToken: {
       type: String,
