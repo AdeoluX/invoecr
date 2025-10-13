@@ -225,6 +225,9 @@ class InvoiceService {
         "customer.code": 1,
         items: 1,
         "entity.name": 1,
+        template: {
+          $ifNull: ["$template", "pdf0"], // Use default template if none is set
+        },
       },
     });
 

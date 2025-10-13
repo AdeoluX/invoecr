@@ -1,0 +1,1184 @@
+{
+  "info": {
+    "name": "InvoiceFullStack Backend API",
+    "description": "Comprehensive API collection for the InvoiceFullStack backend application",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{authToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5110/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "description": "User authentication endpoints",
+      "item": [
+        {
+          "name": "Sign Up",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"password123\",\n  \"businessName\": \"John's Business\",\n  \"businessType\": \"Technology\",\n  \"phoneNumber\": \"+2348012345678\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/sign-up",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "sign-up"]
+            },
+            "description": "Register a new user account"
+          },
+          "response": []
+        },
+        {
+          "name": "Sign In",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/sign-in",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "sign-in"]
+            },
+            "description": "Authenticate user and get access token"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Entity Management",
+      "description": "Business entity management endpoints",
+      "item": [
+        {
+          "name": "Add Bank Account",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bankCode\": \"058\",\n  \"accountNumber\": \"1234567890\",\n  \"accountName\": \"John Doe Business Account\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/entity/add-bank",
+              "host": ["{{baseUrl}}"],
+              "path": ["entity", "add-bank"]
+            },
+            "description": "Add a bank account to the entity"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Bank Accounts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/entity/get-banks",
+              "host": ["{{baseUrl}}"],
+              "path": ["entity", "get-banks"]
+            },
+            "description": "Get all bank accounts for the entity"
+          },
+          "response": []
+        },
+        {
+          "name": "Add Logo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "logo",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/entity/add-logo",
+              "host": ["{{baseUrl}}"],
+              "path": ["entity", "add-logo"]
+            },
+            "description": "Upload entity logo"
+          },
+          "response": []
+        },
+        {
+          "name": "Add Signature",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "signature",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/entity/add-signature",
+              "host": ["{{baseUrl}}"],
+              "path": ["entity", "add-signature"]
+            },
+            "description": "Upload entity signature"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Entity",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"businessName\": \"Updated Business Name\",\n  \"businessType\": \"Technology\",\n  \"address\": \"123 Business Street, Lagos, Nigeria\",\n  \"phoneNumber\": \"+2348012345678\",\n  \"website\": \"www.mybusiness.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/entity",
+              "host": ["{{baseUrl}}"],
+              "path": ["entity"]
+            },
+            "description": "Update entity information"
+          },
+          "response": []
+        },
+        {
+          "name": "Add Member",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"member@example.com\",\n  \"role\": \"admin\",\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Smith\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/entity/add-member",
+              "host": ["{{baseUrl}}"],
+              "path": ["entity", "add-member"]
+            },
+            "description": "Add a member to the entity"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Customer Management",
+      "description": "Customer management endpoints",
+      "item": [
+        {
+          "name": "Create Customer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"ABC Company Ltd\",\n  \"email\": \"contact@abccompany.com\",\n  \"phone\": \"+2348023456789\",\n  \"address\": \"456 Customer Street, Lagos, Nigeria\",\n  \"companyName\": \"ABC Company Ltd\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/customer",
+              "host": ["{{baseUrl}}"],
+              "path": ["customer"]
+            },
+            "description": "Create a new customer"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Customers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/customer",
+              "host": ["{{baseUrl}}"],
+              "path": ["customer"]
+            },
+            "description": "Get all customers for the entity"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Customer by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/customer/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["customer", ":id"]
+            },
+            "description": "Get a specific customer by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Customer",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Customer Name\",\n  \"email\": \"updated@customer.com\",\n  \"phone\": \"+2348034567890\",\n  \"address\": \"Updated Address, Lagos, Nigeria\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/customer/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["customer", ":id"]
+            },
+            "description": "Update customer information"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Customer",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/customer/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["customer", ":id"]
+            },
+            "description": "Delete a customer"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Invoice Management",
+      "description": "Invoice management and PDF generation endpoints",
+      "item": [
+        {
+          "name": "Create Invoice",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer\": \"customer_id_here\",\n  \"items\": [\n    {\n      \"name\": \"Web Development\",\n      \"description\": \"Custom website development\",\n      \"quantity\": 1,\n      \"unitPrice\": 50000\n    },\n    {\n      \"name\": \"Domain Registration\",\n      \"description\": \"Annual domain registration\",\n      \"quantity\": 1,\n      \"unitPrice\": 15000\n    }\n  ],\n  \"issueDate\": \"2024-01-15\",\n  \"dueDate\": \"2024-02-15\",\n  \"paymentTerms\": \"Net 30 days\",\n  \"notes\": \"Thank you for your business!\",\n  \"currency\": \"NGN\",\n  \"taxRate\": 7.5\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/invoice",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoice"]
+            },
+            "description": "Create a new invoice"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Invoices",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/invoice",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoice"]
+            },
+            "description": "Get all invoices for the entity"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Invoice by Code",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/invoice/:code",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoice", ":code"]
+            },
+            "description": "Get a specific invoice by invoice code"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Invoice",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"name\": \"Updated Service\",\n      \"description\": \"Updated service description\",\n      \"quantity\": 2,\n      \"unitPrice\": 25000\n    }\n  ],\n  \"notes\": \"Updated notes\",\n  \"paymentTerms\": \"Net 15 days\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/invoice/:invoiceId",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoice", ":invoiceId"]
+            },
+            "description": "Update an existing invoice"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Invoice",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/invoice/:invoiceId",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoice", ":invoiceId"]
+            },
+            "description": "Delete an invoice"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Dashboard Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/invoice/dashboard",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoice", "dashboard"]
+            },
+            "description": "Get invoice dashboard summary"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Invoice Analytics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/invoice/analytics",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoice", "analytics"]
+            },
+            "description": "Get invoice analytics data"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Invoice Templates",
+      "description": "Invoice template management endpoints",
+      "item": [
+        {
+          "name": "Get Available Templates",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/invoice/templates",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoice", "templates"]
+            },
+            "description": "Get all available invoice templates"
+          },
+          "response": []
+        },
+        {
+          "name": "Generate Template Preview",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/invoice/templates/:templateId/preview",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoice", "templates", ":templateId", "preview"]
+            },
+            "description": "Generate a preview of a specific template"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Invoice PDF Generation",
+      "description": "PDF generation and download endpoints",
+      "item": [
+        {
+          "name": "Download Invoice PDF",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/invoice/:code/pdf?template=invoice1&preview=false",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoice", ":code", "pdf"],
+              "query": [
+                {
+                  "key": "template",
+                  "value": "invoice1",
+                  "description": "Template ID (invoice1, invoice2, invoice3)"
+                },
+                {
+                  "key": "preview",
+                  "value": "false",
+                  "description": "true for preview, false for download"
+                }
+              ]
+            },
+            "description": "Download invoice as PDF using HTML templates"
+          },
+          "response": []
+        },
+        {
+          "name": "Preview Invoice PDF",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/invoice/:code/pdf?template=invoice1&preview=true",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoice", ":code", "pdf"],
+              "query": [
+                {
+                  "key": "template",
+                  "value": "invoice1",
+                  "description": "Template ID (invoice1, invoice2, invoice3)"
+                },
+                {
+                  "key": "preview",
+                  "value": "true",
+                  "description": "true for preview, false for download"
+                }
+              ]
+            },
+            "description": "Preview invoice PDF in browser"
+          },
+          "response": []
+        },
+        {
+          "name": "Download Invoice HTML PDF",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/invoice/:code/html-pdf?template=invoice1",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoice", ":code", "html-pdf"],
+              "query": [
+                {
+                  "key": "template",
+                  "value": "invoice1",
+                  "description": "Template ID (invoice1, invoice2, invoice3)"
+                }
+              ]
+            },
+            "description": "Download invoice as PDF using HTML templates (alternative endpoint)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Payment Processing",
+      "description": "Payment processing and sharing endpoints",
+      "item": [
+        {
+          "name": "Initiate Payment",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/invoice/:code/initiate-payment",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoice", ":code", "initiate-payment"]
+            },
+            "description": "Initiate payment for an invoice"
+          },
+          "response": []
+        },
+        {
+          "name": "Share Invoice via WhatsApp",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phoneNumber\": \"+2348012345678\",\n  \"message\": \"Your invoice is ready!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/invoice/:code/share-whatsapp",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoice", ":code", "share-whatsapp"]
+            },
+            "description": "Share invoice via WhatsApp"
+          },
+          "response": []
+        },
+        {
+          "name": "Share PDF Invoice via WhatsApp",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phoneNumber\": \"+2348012345678\",\n  \"message\": \"Your PDF invoice is ready!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/invoice/:code/share-pdf-whatsapp",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoice", ":code", "share-pdf-whatsapp"]
+            },
+            "description": "Share PDF invoice via WhatsApp"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Subscription Management",
+      "description": "Subscription and billing management endpoints",
+      "item": [
+        {
+          "name": "Get Available Plans",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/subscription/plans",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription", "plans"]
+            },
+            "description": "Get all available subscription plans (public endpoint)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Subscription Comparison",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/subscription/comparison",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription", "comparison"]
+            },
+            "description": "Get subscription plan comparison (public endpoint)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Current Subscription",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscription/current",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription", "current"]
+            },
+            "description": "Get current entity subscription"
+          },
+          "response": []
+        },
+        {
+          "name": "Upgrade Subscription",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"planId\": \"premium\",\n  \"paymentMethod\": \"card\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscription/upgrade",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription", "upgrade"]
+            },
+            "description": "Upgrade subscription plan"
+          },
+          "response": []
+        },
+        {
+          "name": "Downgrade Subscription",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"planId\": \"basic\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscription/downgrade",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription", "downgrade"]
+            },
+            "description": "Downgrade subscription plan"
+          },
+          "response": []
+        },
+        {
+          "name": "Check Limits",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscription/limits",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription", "limits"]
+            },
+            "description": "Check current subscription limits"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Feature Access",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscription/feature/:feature",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription", "feature", ":feature"]
+            },
+            "description": "Check access to a specific feature"
+          },
+          "response": []
+        },
+        {
+          "name": "Check Payment Readiness",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscription/payment-readiness",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription", "payment-readiness"]
+            },
+            "description": "Check if entity is ready for subscription payment"
+          },
+          "response": []
+        },
+        {
+          "name": "Renew Subscription",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"paymentMethod\": \"card\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscription/renew",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription", "renew"]
+            },
+            "description": "Renew current subscription"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Card Management",
+      "description": "Saved card management endpoints",
+      "item": [
+        {
+          "name": "Initialize Card Save",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"customer@example.com\",\n  \"amount\": 10000,\n  \"reference\": \"card_save_ref_123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/card/save/initialize",
+              "host": ["{{baseUrl}}"],
+              "path": ["card", "save", "initialize"]
+            },
+            "description": "Initialize card saving process"
+          },
+          "response": []
+        },
+        {
+          "name": "Save Card",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reference\": \"card_save_ref_123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/card/save/verify",
+              "host": ["{{baseUrl}}"],
+              "path": ["card", "save", "verify"]
+            },
+            "description": "Verify and save card after payment"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Cards",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/card/list",
+              "host": ["{{baseUrl}}"],
+              "path": ["card", "list"]
+            },
+            "description": "Get all saved cards for the entity"
+          },
+          "response": []
+        },
+        {
+          "name": "Set Default Card",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cardId\": \"card_id_here\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/card/default",
+              "host": ["{{baseUrl}}"],
+              "path": ["card", "default"]
+            },
+            "description": "Set a card as default"
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Card",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/card/:cardId",
+              "host": ["{{baseUrl}}"],
+              "path": ["card", ":cardId"]
+            },
+            "description": "Remove a saved card"
+          },
+          "response": []
+        },
+        {
+          "name": "Charge Card",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cardId\": \"card_id_here\",\n  \"amount\": 50000,\n  \"email\": \"customer@example.com\",\n  \"reference\": \"charge_ref_123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/card/charge",
+              "host": ["{{baseUrl}}"],
+              "path": ["card", "charge"]
+            },
+            "description": "Charge a saved card"
+          },
+          "response": []
+        },
+        {
+          "name": "Check Card Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/card/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["card", "status"]
+            },
+            "description": "Check card save status"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Utilities",
+      "description": "Utility endpoints for bank operations and general utilities",
+      "item": [
+        {
+          "name": "List Banks",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/utils/get-banks",
+              "host": ["{{baseUrl}}"],
+              "path": ["utils", "get-banks"]
+            },
+            "description": "Get list of all Nigerian banks"
+          },
+          "response": []
+        },
+        {
+          "name": "Resolve Bank Account",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"accountNumber\": \"1234567890\",\n  \"bankCode\": \"058\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/utils/resolve-bank",
+              "host": ["{{baseUrl}}"],
+              "path": ["utils", "resolve-bank"]
+            },
+            "description": "Resolve bank account details"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Webhooks",
+      "description": "Webhook endpoints for payment processing",
+      "item": [
+        {
+          "name": "Paystack Webhook",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-paystack-signature",
+                "value": "{{paystackSignature}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"charge.success\",\n  \"data\": {\n    \"reference\": \"ref_123\",\n    \"amount\": 50000,\n    \"status\": \"success\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/webhook",
+              "host": ["{{baseUrl}}"],
+              "path": ["webhook"]
+            },
+            "description": "Paystack webhook endpoint (no authentication required)"
+          },
+          "response": []
+        },
+        {
+          "name": "Webhook Callback",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/webhook/callback",
+              "host": ["{{baseUrl}}"],
+              "path": ["webhook", "callback"]
+            },
+            "description": "Webhook callback endpoint"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

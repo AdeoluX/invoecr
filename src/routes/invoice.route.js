@@ -35,7 +35,31 @@ router.get(
   Authorization.authenticateToken,
   InvoiceController.getInvoiceAnalytics
 );
-//
+
+// Template selection routes (must come before /:code routes)
+router.get(
+  `${BASE}/templates`,
+  Authorization.authenticateToken,
+  InvoiceController.getAvailableTemplates
+);
+
+router.get(
+  `${BASE}/templates/:templateId/preview`,
+  Authorization.authenticateToken,
+  InvoiceController.generateTemplatePreview
+);
+
+// Parameterized routes (must come after specific routes)
+// PUT and DELETE routes must come before GET routes to avoid conflicts
+router.put(
+  `${BASE}/:invoiceId`,
+  // validateReq(updateInvoiceSchema),
+  Authorization.authenticateToken,
+  InvoiceController.updateInvoice
+);
+router.delete(`${BASE}/:invoiceId`, InvoiceController.deleteInvoice);
+
+// GET routes
 router.get(`${BASE}/:code/initiate-payment`, InvoiceController.initiatePayment);
 router.get(
   `${BASE}/:code`,
@@ -54,13 +78,13 @@ router.get(
   Authorization.authenticateToken,
   InvoiceController.downloadInvoicePDF
 );
-router.put(
-  `${BASE}/:invoiceId`,
-  validateReq(updateInvoiceSchema),
+
+// Download invoice as PDF using HTML templates
+router.get(
+  `${BASE}/:code/html-pdf`,
   Authorization.authenticateToken,
-  InvoiceController.updateInvoice
+  InvoiceController.downloadInvoiceHTMLPDF
 );
-router.delete(`${BASE}/:invoiceId`, InvoiceController.deleteInvoice);
 
 // Nigeria-specific routes
 

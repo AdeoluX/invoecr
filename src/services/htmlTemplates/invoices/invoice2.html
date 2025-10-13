@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Invoice</title>
+    <style>
+      @page {
+        size: A4;
+        margin: 0;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        width: 210mm;
+        min-height: 297mm;
+        background-color: #f4f4f4;
+        box-sizing: border-box;
+      }
+
+      .invoice-container {
+        width: 100%;
+        height: 100vh;
+        min-height: 297mm;
+        margin: 0;
+        background-color: #fff;
+        padding: 20mm;
+        box-shadow: none;
+        box-sizing: border-box;
+        page-break-inside: avoid;
+        display: flex;
+        flex-direction: column;
+      }
+      .invoice-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 30px;
+      }
+      .logo {
+        display: flex;
+        align-items: center;
+      }
+      .logo img {
+        width: 40px;
+        height: 40px;
+        margin-right: 10px;
+      }
+      .logo-text .logo-name {
+        font-size: 24px;
+        font-weight: bold;
+        color: #cc0000;
+      }
+      .logo-text .logo-tagline {
+        font-size: 12px;
+        color: #666;
+      }
+      .invoice-details {
+        text-align: right;
+      }
+      .invoice-title {
+        font-size: 36px;
+        font-weight: bold;
+        color: #333;
+        margin: 0 0 10px;
+      }
+      .invoice-info p {
+        margin: 5px 0;
+        color: #666;
+        font-size: 14px;
+      }
+      .invoice-info span {
+        font-weight: bold;
+      }
+      .bill-to {
+        margin-bottom: 30px;
+        font-size: 14px;
+      }
+      .bill-to h3 {
+        margin: 0 0 5px;
+        font-size: 16px;
+        color: #555;
+        font-weight: normal;
+      }
+      .bill-to-name {
+        font-weight: bold;
+        font-size: 18px;
+        color: #333;
+        margin: 0 0 10px;
+      }
+      .invoice-table {
+        border-collapse: collapse;
+        width: 100%;
+        flex-grow: 1;
+        margin-top: 20px;
+      }
+      .table-header {
+        display: flex;
+        background-color: #cc0000;
+        color: #fff;
+        padding: 10px 20px;
+        font-weight: bold;
+      }
+      .table-header div {
+        flex: 1;
+        text-align: left;
+      }
+      .table-header .item-description {
+        flex: 4;
+      }
+      .table-row {
+        display: flex;
+        align-items: center;
+        padding: 15px 20px;
+        border-bottom: 1px solid #eee;
+      }
+      .table-row:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+      .table-row h4 {
+        margin: 0;
+        font-size: 16px;
+        color: #333;
+      }
+      .table-row p {
+        margin: 5px 0 0;
+        font-size: 12px;
+        color: #666;
+      }
+      .table-row .item-description {
+        flex: 4;
+      }
+      .table-row .price,
+      .table-row .qty,
+      .table-row .total {
+        flex: 1;
+        font-size: 14px;
+        text-align: left;
+      }
+      .payment-info-summary {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-top: 30px;
+      }
+      .payment-info {
+        width: 45%;
+      }
+      .payment-info h4 {
+        background-color: #cc0000;
+        color: #fff;
+        padding: 8px 15px;
+        margin: 0 0 10px;
+      }
+      .payment-info p {
+        margin: 5px 0;
+        font-size: 14px;
+        color: #555;
+      }
+      .summary {
+        width: 45%;
+        text-align: right;
+      }
+      .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-size: 16px;
+      }
+      .summary-row span:last-child {
+        font-weight: bold;
+      }
+      .grand-total-row {
+        background-color: #cc0000;
+        color: #fff;
+        padding: 10px 15px;
+        display: flex;
+        justify-content: space-between;
+        font-size: 20px;
+        font-weight: bold;
+      }
+      .grand-total-row .grand-total-label {
+        text-transform: uppercase;
+      }
+      .thank-you {
+        margin-top: 30px;
+        font-size: 14px;
+        color: #333;
+      }
+      .thank-you .terms {
+        font-size: 12px;
+        color: #666;
+      }
+      .signature {
+        text-align: right;
+        margin-top: 20px;
+      }
+      .signature-line {
+        font-family: "Dancing Script", cursive;
+        font-size: 24px;
+        margin: 0;
+      }
+      .signer-name {
+        font-weight: bold;
+        margin: 5px 0 0;
+      }
+      .signer-title {
+        font-size: 12px;
+        color: #666;
+        margin: 0;
+      }
+      .invoice-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #cc0000;
+        color: #fff;
+        padding: 15px 40px;
+        margin-top: 30px;
+      }
+      .contact-info {
+        display: flex;
+      }
+      .contact-item {
+        display: flex;
+        align-items: center;
+        margin-right: 30px;
+      }
+      .contact-item img {
+        width: 20px;
+        height: 20px;
+        filter: invert(1);
+        margin-right: 10px;
+      }
+      .contact-item p {
+        margin: 0;
+        font-size: 12px;
+        line-height: 1.4;
+      }
+      .contact-item a {
+        color: #fff;
+        text-decoration: none;
+      }
+      .address-footer {
+        display: flex;
+        align-items: center;
+        font-size: 12px;
+      }
+      .address-footer img {
+        width: 15px;
+        height: 15px;
+        filter: invert(1);
+        margin-right: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="invoice-container">
+      <header class="invoice-header">
+        <div class="logo">
+          <img src="{{ENTITY_LOGO}}" alt="{{ENTITY_NAME}} Logo" />
+          <div class="logo-text">
+            <span class="logo-name">{{ENTITY_NAME}}</span>
+            <span class="logo-tagline">{{ENTITY_EMAIL}}</span>
+          </div>
+        </div>
+        <div class="invoice-details">
+          <h1 class="invoice-title">INVOICE</h1>
+          <div class="invoice-info">
+            <p>Invoice No: <span>{{INVOICE_NUMBER}}</span></p>
+            <p>Account No: <span>{{ENTITY_PHONE}}</span></p>
+            <p>Date: <span>{{INVOICE_DATE}}</span></p>
+          </div>
+        </div>
+      </header>
+
+      <div class="bill-to">
+        <h3>INVOICE TO:</h3>
+        <p class="bill-to-name">{{CUSTOMER_NAME}}</p>
+        <p>Add: {{CUSTOMER_ADDRESS}}</p>
+        <p>Pho: {{CUSTOMER_PHONE}}</p>
+        <p>Email: {{CUSTOMER_EMAIL}}</p>
+      </div>
+
+      <div class="invoice-table">
+        <div class="table-header">
+          <div class="item-description">ITEM DESCRIPTION</div>
+          <div class="price">PRICE</div>
+          <div class="qty">QTY</div>
+          <div class="total">TOTAL</div>
+        </div>
+        <div class="table-body">{{ITEMS_TABLE}}</div>
+      </div>
+
+      <div class="payment-info-summary">
+        <div class="payment-info">
+          <h4>PAYMENT INFO</h4>
+          <p>Email: <a href="mailto:{{ENTITY_EMAIL}}">{{ENTITY_EMAIL}}</a></p>
+          <p>
+            Payment:
+            <a
+              href="{{PAYMENT_LINK}}"
+              target="_blank"
+              style="color: #cc0000; text-decoration: none; font-weight: bold"
+              >Click here to pay</a
+            >
+          </p>
+          <p>Status: {{PAYMENT_STATUS}}</p>
+        </div>
+        <div class="summary">
+          <div class="summary-row">
+            <span>Sub Total</span>
+            <span>{{SUBTOTAL}}</span>
+          </div>
+          <div class="summary-row">
+            <span>Tax: VAT {{TAX_RATE}}</span>
+            <span>{{TAX_AMOUNT}}</span>
+          </div>
+          <div class="grand-total-row">
+            <span class="grand-total-label">GRAND TOTAL</span>
+            <span class="grand-total-value">{{TOTAL}}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="thank-you">
+        <p>Thank you for your business!</p>
+        <p class="terms">TERMS: {{NOTES}}</p>
+      </div>
+
+      <div class="signature">
+        <p class="signature-line">Jonathan Smith</p>
+        <p class="signer-name">Jonathan Smith</p>
+        <p class="signer-title">Account Manager</p>
+      </div>
+
+      <footer class="invoice-footer">
+        <div class="contact-info">
+          <div class="contact-item">
+            <img src="https://i.imgur.com/K1n898y.png" alt="Phone icon" />
+            <p>000 123 456 789 12<br />000 123 456 789 12</p>
+          </div>
+          <div class="contact-item">
+            <img src="https://i.imgur.com/4bF58mP.png" alt="Email icon" />
+            <p>
+              <a href="mailto:urname@gmail.com">urname@gmail.com</a><br /><a
+                href="http://www.urwebsite.com"
+                >www.urwebsite.com</a
+              >
+            </p>
+          </div>
+        </div>
+        <div class="address-footer">
+          <img src="https://i.imgur.com/tYt6Cj5.png" alt="Location pin icon" />
+          <p>Street Address Here Avenue : 1234578</p>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

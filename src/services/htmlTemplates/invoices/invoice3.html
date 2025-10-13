@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Invoice - Brand Name</title>
+    <style>
+      @page {
+        size: A4;
+        margin: 0;
+      }
+
+      body {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        width: 210mm;
+        min-height: 297mm;
+        background-color: #f8f8f8;
+        box-sizing: border-box;
+      }
+
+      .invoice-container {
+        width: 100%;
+        height: 100vh;
+        min-height: 297mm;
+        margin: 0;
+        background-color: #fff;
+        box-shadow: none;
+        border-radius: 0;
+        overflow: hidden;
+        position: relative;
+        box-sizing: border-box;
+        page-break-inside: avoid;
+        display: flex;
+        flex-direction: column;
+      }
+      .header-top-bar {
+        height: 10px;
+        background-color: #f0f0f0;
+      }
+      .invoice-header {
+        display: flex;
+        justify-content: space-between;
+        padding: 30px 40px;
+        padding-bottom: 0;
+      }
+      .company-info {
+        display: flex;
+        align-items: center;
+      }
+      .company-logo {
+        width: 30px;
+        height: 30px;
+        margin-right: 10px;
+        background-color: #333;
+        border-radius: 3px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        font-size: 18px;
+        font-weight: bold;
+      }
+      .company-logo::before {
+        content: "▲";
+        transform: rotate(45deg);
+      }
+      .company-details {
+        display: flex;
+        flex-direction: column;
+      }
+      .brand-name {
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 3px;
+      }
+      .tagline {
+        font-size: 10px;
+        color: #999;
+        text-transform: uppercase;
+      }
+      .invoice-title-block {
+        background-color: #ef532e;
+        color: #fff;
+        padding: 25px 40px;
+        text-align: right;
+        font-size: 38px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 35%;
+        height: 100px;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        z-index: 1;
+      }
+      .invoice-title-block h2 {
+        margin: 0;
+        padding: 0;
+        line-height: 1;
+      }
+      .invoice-address-details {
+        padding: 20px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-top: 20px;
+        position: relative;
+        z-index: 2;
+      }
+      .bill-to,
+      .invoice-meta {
+        font-size: 13px;
+        line-height: 1.5;
+      }
+      .bill-to h4,
+      .invoice-meta h4 {
+        font-size: 14px;
+        font-weight: normal;
+        color: #666;
+        margin: 0 0 5px;
+      }
+      .bill-to p {
+        margin: 0;
+        color: #333;
+      }
+      .bill-to .client-name {
+        font-weight: bold;
+        font-size: 15px;
+        color: #000;
+      }
+      .invoice-meta {
+        text-align: right;
+        width: 30%;
+      }
+      .invoice-meta p {
+        margin: 0;
+        color: #333;
+      }
+      .invoice-meta p span {
+        font-weight: bold;
+        color: #000;
+      }
+      .invoice-meta .meta-label {
+        display: inline-block;
+        width: 70px;
+        text-align: left;
+      }
+      .item-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 30px;
+        background-color: #fdfdfd;
+        flex-grow: 1;
+      }
+      .item-table thead th {
+        background-color: #f0f0f0;
+        color: #666;
+        font-size: 12px;
+        font-weight: bold;
+        text-align: left;
+        padding: 15px 40px;
+        border-bottom: 1px solid #eee;
+        text-transform: uppercase;
+      }
+      .item-table tbody td {
+        padding: 15px 40px;
+        border-bottom: 1px solid #eee;
+        font-size: 13px;
+        color: #333;
+      }
+      .item-table tbody tr:last-child td {
+        border-bottom: none;
+      }
+      .item-table .sl {
+        width: 5%;
+      }
+      .item-table .description {
+        width: 50%;
+      }
+      .item-table .price {
+        width: 15%;
+        text-align: left;
+      }
+      .item-table .qty {
+        width: 10%;
+        text-align: left;
+      }
+      .item-table .total {
+        width: 20%;
+        text-align: left;
+      }
+      .summary-section {
+        display: flex;
+        justify-content: space-between;
+        padding: 30px 40px;
+        border-top: 1px solid #eee;
+      }
+      .left-summary {
+        width: 50%;
+      }
+      .left-summary h4 {
+        font-size: 14px;
+        color: #333;
+        margin: 0 0 10px;
+      }
+      .payment-info p,
+      .terms-conditions p {
+        margin: 5px 0;
+        font-size: 12px;
+        color: #666;
+      }
+      .payment-info strong {
+        color: #333;
+      }
+      .terms-conditions {
+        margin-top: 20px;
+      }
+      .terms-conditions h4 {
+        margin-bottom: 5px;
+      }
+      .right-summary {
+        width: 40%;
+        text-align: right;
+      }
+      .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        font-size: 14px;
+        color: #333;
+      }
+      .summary-row span:first-child {
+        color: #666;
+      }
+      .summary-row.total-amount {
+        font-size: 18px;
+        font-weight: bold;
+        padding-top: 10px;
+        border-top: 1px solid #eee;
+        margin-top: 15px;
+      }
+      .summary-row.total-amount span {
+        color: #ef532e;
+      }
+      .signature-section {
+        margin-top: 50px;
+        text-align: right;
+        padding: 0 40px 30px 40px;
+        font-size: 12px;
+        color: #666;
+      }
+      .signature-line {
+        border-top: 1px solid #ccc;
+        width: 180px;
+        margin-left: auto;
+        padding-top: 5px;
+        margin-bottom: 5px;
+      }
+      .authorised-sign {
+        margin: 0;
+        font-weight: bold;
+      }
+      .footer-bar {
+        height: 10px;
+        background-color: #ef532e;
+        width: 100%;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="invoice-container">
+      <div class="header-top-bar"></div>
+      <div class="invoice-title-block">
+        <h2>INVOICE</h2>
+      </div>
+      <div class="invoice-header">
+        <div class="company-info">
+          <div class="company-logo"></div>
+          <div class="company-details">
+            <div class="brand-name">{{ENTITY_NAME}}</div>
+            <div class="tagline">{{ENTITY_EMAIL}}</div>
+          </div>
+        </div>
+      </div>
+      <div class="invoice-address-details">
+        <div class="bill-to">
+          <h4>Invoice to:</h4>
+          <p class="client-name">{{CUSTOMER_NAME}}</p>
+          <p>{{CUSTOMER_ADDRESS}}</p>
+          <p>Phone: {{CUSTOMER_PHONE}}</p>
+          <p>Email: {{CUSTOMER_EMAIL}}</p>
+        </div>
+        <div class="invoice-meta">
+          <p><span class="meta-label">Invoice#</span> {{INVOICE_NUMBER}}</p>
+          <p><span class="meta-label">Date:</span> {{INVOICE_DATE}}</p>
+          <p><span class="meta-label">Due:</span> {{DUE_DATE}}</p>
+        </div>
+      </div>
+      <table class="item-table">
+        <thead>
+          <tr>
+            <th class="sl">SL.</th>
+            <th class="description">Item Description</th>
+            <th class="price">Price</th>
+            <th class="qty">Qty.</th>
+            <th class="total">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{ITEMS_TABLE}}
+        </tbody>
+      </table>
+      <div class="summary-section">
+        <div class="left-summary">
+          <h4>Thank you for your business</h4>
+          <div class="payment-info">
+            <h4>Payment Info:</h4>
+            <p>Email: <strong>{{ENTITY_EMAIL}}</strong></p>
+            <p>Phone: <strong>{{ENTITY_PHONE}}</strong></p>
+            <p>
+              Payment Link:
+              <a
+                href="{{PAYMENT_LINK}}"
+                target="_blank"
+                style="color: #ef532e; text-decoration: none; font-weight: bold"
+                >Click here to pay</a
+              >
+            </p>
+          </div>
+          <div class="terms-conditions">
+            <h4>Terms & Conditions</h4>
+            <p>{{NOTES}}</p>
+          </div>
+        </div>
+        <div class="right-summary">
+          <div class="summary-row">
+            <span>Sub Total:</span>
+            <span>{{SUBTOTAL}}</span>
+          </div>
+          <div class="summary-row">
+            <span>Tax ({{TAX_RATE}}):</span>
+            <span>{{TAX_AMOUNT}}</span>
+          </div>
+          <div class="summary-row total-amount">
+            <span>Total:</span>
+            <span>{{TOTAL}}</span>
+          </div>
+        </div>
+      </div>
+      <div class="signature-section">
+        <div class="signature-line"></div>
+        <p class="authorised-sign">Authorised Sign</p>
+      </div>
+      <div class="footer-bar"></div>
+    </div>
+  </body>
+</html>

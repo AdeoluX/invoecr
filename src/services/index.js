@@ -7,6 +7,7 @@ const AnalyticsService = require("./analytics.service");
 const SubscriptionService = require("./subscription.service");
 const CardService = require("./card.service");
 const { CustomerService } = require("./customer.service");
+const PDFService = require("./pdf.service");
 
 module.exports = {
   AuthService,
@@ -18,4 +19,5 @@ module.exports = {
   SubscriptionService,
   CardService,
   CustomerService,
+  PDFService,
 };

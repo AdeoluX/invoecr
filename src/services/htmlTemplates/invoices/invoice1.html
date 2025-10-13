@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Invoice - Modern Blue</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f0f3f6;
+      }
+
+      .invoice-container {
+        width: 700px;
+        margin: 0 auto;
+        background-color: #fff;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        position: relative;
+        padding: 0 20px;
+      }
+
+      /* Diagonal top-right corner */
+      .top-right-diagonal {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-width: 0 350px 350px 0;
+        border-color: transparent #e0e9f1 transparent transparent;
+        z-index: 1;
+      }
+
+      /* Invoice Header */
+      .invoice-header {
+        display: flex;
+        justify-content: space-between;
+        padding: 40px;
+        padding-bottom: 20px;
+        z-index: 2;
+        position: relative;
+      }
+
+      .company-info {
+        width: 250px;
+        background-color: #3182ce; /* Dark blue background */
+        color: white;
+        padding: 20px;
+        font-size: 14px;
+      }
+
+      .logo-box {
+        border: 2px solid white;
+        padding: 10px;
+        text-align: center;
+        margin-bottom: 10px;
+      }
+
+      .brand-name {
+        font-size: 20px;
+        font-weight: bold;
+      }
+
+      .company-info p {
+        margin: 5px 0;
+        line-height: 1.4;
+      }
+
+      .invoice-title-block {
+        text-align: right;
+        padding: 20px;
+        z-index: 2;
+      }
+
+      .invoice-title-block h1 {
+        font-size: 40px;
+        color: #333;
+        text-transform: uppercase;
+        margin: 0;
+      }
+
+      .invoice-title-block p {
+        margin: 5px 0;
+        font-size: 14px;
+        color: #555;
+      }
+
+      .invoice-title-block span {
+        font-weight: bold;
+        color: #333;
+      }
+
+      /* Client Info */
+      .client-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 40px;
+      }
+
+      .bill-to {
+        font-size: 14px;
+        line-height: 1.5;
+        color: #555;
+        width: 50%;
+      }
+
+      .bill-to h4 {
+        font-size: 15px;
+        font-weight: bold;
+        color: #333;
+        border-bottom: 2px solid #3182ce;
+        padding-bottom: 5px;
+        display: inline-block;
+      }
+
+      .bill-to p {
+        margin: 5px 0;
+      }
+
+      .due-amount {
+        background-color: #3182ce;
+        color: white;
+        display: flex;
+        align-items: center;
+        padding: 5px 15px;
+        border-radius: 5px;
+      }
+
+      .due-amount-label {
+        font-size: 14px;
+        font-weight: bold;
+        padding-right: 10px;
+      }
+
+      .due-amount-value {
+        background-color: #f0f0f0;
+        color: #333;
+        padding: 10px 15px;
+        font-size: 18px;
+        font-weight: bold;
+        border-radius: 5px;
+        min-width: 150px; /* Adjust as needed */
+      }
+
+      /* Item Table */
+      .item-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+      }
+
+      .item-table thead th {
+        background-color: #3182ce;
+        color: white;
+        font-size: 12px;
+        text-align: left;
+        padding: 12px 10px;
+      }
+
+      .item-table .no-col {
+        width: 5%;
+      }
+      .item-table .desc-col {
+        width: 55%;
+      }
+      .item-table .unit-col,
+      .item-table .qty-col {
+        width: 15%;
+        text-align: right;
+      }
+      .item-table .value-col {
+        width: 10%;
+        background-color: #4a5568;
+      } /* Darker blue/grey for value column */
+
+      .item-table tbody td {
+        padding: 10px 10px;
+        border-bottom: 1px solid #e2e8f0;
+        font-size: 13px;
+      }
+      .item-table tbody td:first-child {
+        font-weight: bold;
+      }
+
+      .item-table tbody td:nth-child(3),
+      .item-table tbody td:nth-child(4) {
+        text-align: right;
+      }
+
+      .item-table tbody td:last-child {
+        background-color: #4a5568;
+        color: white;
+        text-align: center;
+        font-weight: bold;
+      }
+
+      /* Footer sections */
+      .invoice-footer {
+        display: flex;
+        justify-content: space-between;
+        padding: 20px 40px;
+        border-top: 1px solid #e2e8f0;
+        position: relative;
+      }
+
+      .payment-terms {
+        width: 60%;
+        font-size: 13px;
+        color: #555;
+        line-height: 1.5;
+      }
+      .payment-terms h4 {
+        color: #3182ce;
+        font-size: 14px;
+        margin: 0;
+        margin-bottom: 5px;
+      }
+
+      .summary-totals {
+        width: 35%;
+        text-align: right;
+        font-size: 14px;
+      }
+
+      .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 5px;
+      }
+      .summary-row.grand-total {
+        background-color: #4a5568;
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        padding: 10px;
+        margin-top: 15px;
+        justify-content: space-between;
+      }
+
+      .summary-row.grand-total span:first-child {
+        margin-right: 20px;
+      }
+
+      .bottom-thanks {
+        background-color: #3182ce;
+        color: white;
+        text-align: center;
+        padding: 15px;
+        font-size: 16px;
+        font-weight: bold;
+        text-transform: uppercase;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="invoice-container">
+      <div class="top-right-diagonal"></div>
+
+      <header class="invoice-header">
+        <div class="company-info">
+          <div class="logo-box">
+            <span class="brand-name">{{ENTITY_NAME}}</span>
+            <p>{{ENTITY_EMAIL}}</p>
+          </div>
+          <p>{{ENTITY_PHONE}}</p>
+          <p>{{ENTITY_EMAIL}}</p>
+          <p>{{ENTITY_WEBSITE}}</p>
+          <p>{{ENTITY_ADDRESS}}</p>
+        </div>
+
+        <div class="invoice-title-block">
+          <h1>INVOICE</h1>
+          <p>Invoice No: <span>{{INVOICE_NUMBER}}</span></p>
+          <p>Issue Date: <span>{{INVOICE_DATE}}</span></p>
+          <p>Due Date: <span>{{DUE_DATE}}</span></p>
+        </div>
+      </header>
+
+      <div class="client-info">
+        <div class="bill-to">
+          <h4>BILL TO</h4>
+          <p>{{CUSTOMER_NAME}}</p>
+          <p>{{CUSTOMER_EMAIL}}</p>
+          <p>{{CUSTOMER_ADDRESS}}</p>
+          <p>Phone: {{CUSTOMER_PHONE}}</p>
+        </div>
+        <div class="due-amount">
+          <div class="due-amount-label">TOTAL:</div>
+          <div class="due-amount-value">{{TOTAL}}</div>
+        </div>
+      </div>
+
+      <table class="item-table">
+        <thead>
+          <tr>
+            <th class="no-col">No</th>
+            <th class="desc-col">Item Description</th>
+            <th class="unit-col">Unit Price</th>
+            <th class="qty-col">Quantity</th>
+            <th class="value-col">Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{ITEMS_TABLE}}
+        </tbody>
+      </table>
+
+      <div class="invoice-footer">
+        <div class="payment-terms">
+          <h4>Payment Method</h4>
+          <p>
+            <a
+              href="{{PAYMENT_LINK}}"
+              target="_blank"
+              style="color: #3182ce; text-decoration: none; font-weight: bold"
+              >Click here to pay online</a
+            >
+          </p>
+          <br />
+          <h4>Payment Terms</h4>
+          <p>{{PAYMENT_TERMS}}</p>
+          <br />
+          <h4>Terms & Conditions</h4>
+          <p>{{NOTES}}</p>
+        </div>
+        <div class="summary-totals">
+          <div class="summary-row">
+            <span>SUB TOTAL</span>
+            <span>{{SUBTOTAL}}</span>
+          </div>
+          <div class="summary-row">
+            <span>TAX ({{TAX_RATE}})</span>
+            <span>{{TAX_AMOUNT}}</span>
+          </div>
+          <div class="summary-row grand-total">
+            <span>GRAND TOTAL</span>
+            <span>{{TOTAL}}</span>
+          </div>
+          <div
+            style="
+              text-align: right;
+              margin-top: 30px;
+              font-size: 12px;
+              color: #555;
+            "
+          >
+            <p>signature</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-thanks">
+        <p>THANK YOU FOR YOUR BUSINESS</p>
+      </div>
+    </div>
+  </body>
+</html>

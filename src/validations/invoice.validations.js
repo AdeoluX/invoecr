@@ -34,6 +34,17 @@ const createInvoiceSchema = {
       terms: Joi.string().optional().allow(""),
       subtotal: Joi.number().required().min(0),
       tax: Joi.number().optional().min(0).default(0),
+      template: Joi.string()
+        .valid(
+          "pdf0",
+          "pdf1",
+          "pdf2",
+          "pdf3",
+          "invoice1",
+          "invoice2",
+          "invoice3"
+        )
+        .default("pdf0"),
     })
     .xor("customer_id", "customer"),
   files: Joi.object()
@@ -56,6 +67,7 @@ const updateInvoiceSchema = {
     .optional()
     .keys({
       customerId: Joi.string().optional(),
+      currency: Joi.string().valid("USD", "EUR", "GBP", "NGN").optional(),
       customer: Joi.object()
         .keys({
           name: Joi.string().optional(),
@@ -66,9 +78,11 @@ const updateInvoiceSchema = {
       items: Joi.array()
         .items(
           Joi.object().keys({
+            name: Joi.string().optional(),
             description: Joi.string().optional(),
             quantity: Joi.number().min(1).optional(),
             unitPrice: Joi.number().min(0).optional(),
+            total: Joi.number().min(0).optional(),
           })
         )
         .optional(),
@@ -81,6 +95,18 @@ const updateInvoiceSchema = {
       terms: Joi.string().optional().allow(""),
       subtotal: Joi.number().min(0).optional(),
       tax: Joi.number().min(0).optional(),
+      total: Joi.number().min(0).optional(),
+      template: Joi.string()
+        .valid(
+          "pdf0",
+          "pdf1",
+          "pdf2",
+          "pdf3",
+          "invoice1",
+          "invoice2",
+          "invoice3"
+        )
+        .optional(),
     }),
   files: Joi.object()
     .optional()

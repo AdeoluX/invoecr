@@ -66,6 +66,19 @@ var invoiceSchema = new mongoose.Schema(
     whatsappShareDate: { type: Date },
     paymentLink: { type: String },
     termiiMessageId: { type: String }, // For Termii WhatsApp tracking
+    template: {
+      type: String,
+      enum: [
+        "pdf0",
+        "pdf1",
+        "pdf2",
+        "pdf3",
+        "invoice1",
+        "invoice2",
+        "invoice3",
+      ],
+      default: "invoice1",
+    }, // PDF template selection
   },
   { timestamps: true }
 );

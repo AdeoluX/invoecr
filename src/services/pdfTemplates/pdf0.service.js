@@ -1,7 +1,5 @@
 const PDFDocument = require("pdfkit");
 const QRCode = require("qrcode");
-const { SubscriptionService } = require("./subscription.service");
-const HTMLPDFService = require("./htmlPdf.service");
 
 class PDFService {
   /**
@@ -539,14 +537,9 @@ class PDFService {
    * Generate invoice PDF buffer for download
    * @param {string} invoiceId - Invoice ID
    * @param {string} entityId - Entity ID
-   * @param {string} templateId - Template ID (pdf0, pdf1, pdf2, pdf3)
    * @returns {Promise<Buffer>} PDF buffer
    */
-  static async generateInvoicePDFBuffer(
-    invoiceId,
-    entityId,
-    templateId = "pdf0"
-  ) {
+  static async generateInvoicePDFBuffer(invoiceId, entityId) {
     try {
       if (!invoiceId || !entityId) {
         throw new Error("Missing invoiceId or entityId");
@@ -571,19 +564,8 @@ class PDFService {
         throw new Error("Entity not found");
       }
 
-      // Use the specified template or fallback to default
-      let PDFService;
-      try {
-        PDFService = require(`../services/pdfTemplates/${templateId}.service`);
-      } catch (templateError) {
-        console.warn(
-          `Template ${templateId} not found, using default template`
-        );
-        PDFService = require(`../services/pdfTemplates/pdf0.service`);
-      }
-
-      // Generate PDF with selected template
-      const pdfBuffer = await PDFService.generateInvoicePDF(
+      // Generate PDF
+      const pdfBuffer = await this.generateInvoicePDF(
         invoice,
         entity,
         invoice.customer,
@@ -595,83 +577,11 @@ class PDFService {
       console.error("PDF Generation Error:", {
         invoiceId,
         entityId,
-        templateId,
         error: error.message,
         stack: error.stack,
       });
       throw new Error(`Failed to generate PDF: ${error.message}`);
     }
-  }
-
-  static async generateInvoiceUsingHTMLTemplate(
-    invoiceId,
-    entityId,
-    templateId = "invoice1"
-  ) {
-    try {
-      const Invoice = require("../models/invoice.model");
-      const invoice = await Invoice.findById(invoiceId)
-        .populate("customer")
-        .populate("entity")
-        .populate("items");
-
-      if (!invoice) {
-        throw new Error("Invoice not found");
-      }
-
-      const Entity = require("../models/entity.model");
-      const entity = await Entity.findById(entityId).populate(
-        "subscriptionPlan"
-      );
-
-      if (!entity) {
-        throw new Error("Entity not found");
-      }
-
-      // Use the new HTML PDF service
-      const pdfBuffer = await HTMLPDFService.generateInvoicePdfFromHtml(
-        invoice,
-        entity,
-        invoice.customer,
-        entity.subscriptionPlan,
-        templateId
-      );
-      return pdfBuffer;
-    } catch (error) {
-      console.error("PDF Generation Error:", {
-        invoiceId,
-        entityId,
-        templateId,
-        error: error.message,
-        stack: error.stack,
-      });
-      throw new Error(`Failed to generate PDF: ${error.message}`);
-    }
-  }
-
-  /**
-   * Generate invoice PDF from HTML template using Playwright
-   * @param {Object} invoice - Invoice data
-   * @param {Object} entity - Entity data
-   * @param {Object} customer - Customer data
-   * @param {Object} subscriptionPlan - Subscription plan data
-   * @param {string} templateId - Template ID (invoice1, invoice2, invoice3)
-   * @returns {Promise<Buffer>} PDF buffer
-   */
-  static async generateInvoicePdfFromHtml(
-    invoice,
-    entity,
-    customer,
-    subscriptionPlan,
-    templateId = "invoice3"
-  ) {
-    return await HTMLPDFService.generateInvoicePdfFromHtml(
-      invoice,
-      entity,
-      customer,
-      subscriptionPlan,
-      templateId
-    );
   }
 }
 

@@ -35,7 +35,7 @@ class CardService {
       if (paymentResponse.status) {
         return {
           success: true,
-          paymentUrl: paymentResponse.data.authorization_url,
+          authorizationUrl: paymentResponse.data.authorization_url,
           reference: paymentResponse.data.reference,
           amount: paymentData.amount, // ₦1.00
           currency: "NGN",

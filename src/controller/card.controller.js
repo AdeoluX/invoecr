@@ -8,8 +8,18 @@ class CardController {
   // Initialize card saving process
   static initializeCardSave = catchAsync(async (req, res, next) => {
     const user = req.user;
-    let { callbackUrl = process.env.PAYSTACK_CALLBACK_URL } = req.body;
-    callbackUrl = process.env.PAYSTACK_CALLBACK_URL;
+    let callbackUrl;
+
+    // Safely extract callbackUrl from request body if it exists
+    if (req.body && req.body.callbackUrl) {
+      callbackUrl = req.body.callbackUrl;
+    }
+
+    // Use callbackUrl from request body, or fallback to environment variable, or use default
+    callbackUrl =
+      callbackUrl ||
+      process.env.PAYSTACK_CALLBACK_URL ||
+      "https://yourapp.com/callback";
 
     abortIf(!callbackUrl, httpStatus.BAD_REQUEST, "Callback URL is required");
 
