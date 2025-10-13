@@ -8,7 +8,7 @@ class CardController {
   // Initialize card saving process
   static initializeCardSave = catchAsync(async (req, res, next) => {
     const user = req.user;
-    let callbackUrl;
+    let callbackUrl; //
 
     // Safely extract callbackUrl from request body if it exists
     if (req.body && req.body.callbackUrl) {
