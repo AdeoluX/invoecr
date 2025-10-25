@@ -76,6 +76,7 @@ var invoiceSchema = new mongoose.Schema(
         "invoice1",
         "invoice2",
         "invoice3",
+        "invoice4",
       ],
       default: "invoice1",
     }, // PDF template selection

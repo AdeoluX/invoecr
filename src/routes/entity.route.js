@@ -24,13 +24,11 @@ router.get(
 );
 router.post(
   `${BASE}/add-logo`,
-  validateReq(addBankSchema),
   Authorization.authenticateToken,
   EntityController.addLogo
 );
 router.post(
   `${BASE}/add-signature`,
-  validateReq(addBankSchema),
   Authorization.authenticateToken,
   EntityController.addSignature
 );

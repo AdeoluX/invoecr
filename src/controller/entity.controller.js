@@ -23,14 +23,16 @@ class EntityController {
   });
 
   static addLogo = catchAsync(async (req, res, next) => {
-    const { accountNumber, bankCode } = req.body;
-    const entity = await UtilsService.verifyBankNumber(accountNumber, bankCode);
+    const file = req.files.logo;
+    const { id } = req.user;
+    const entity = await EntityService.addLogo({ file, entityId: id });
     return successResponse(req, res, entity, "Operation Successful");
   });
 
   static addSignature = catchAsync(async (req, res, next) => {
-    const { accountNumber, bankCode } = req.body;
-    const entity = await UtilsService.verifyBankNumber(accountNumber, bankCode);
+    const file = req.files.signature;
+    const { id } = req.user;
+    const entity = await EntityService.addSignature({ file, entityId: id });
     return successResponse(req, res, entity, "Operation Successful");
   });
 

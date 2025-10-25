@@ -284,7 +284,13 @@
       </div>
       <div class="invoice-header">
         <div class="company-info">
-          <div class="company-logo"></div>
+          <div class="company-logo">
+            <img
+              src="{{ENTITY_LOGO}}"
+              alt="{{ENTITY_NAME}} Logo"
+              style="max-width: 80px; max-height: 80px; display: {{ENTITY_LOGO_DISPLAY}};"
+            />
+          </div>
           <div class="company-details">
             <div class="brand-name">{{ENTITY_NAME}}</div>
             <div class="tagline">{{ENTITY_EMAIL}}</div>
@@ -357,7 +363,15 @@
         </div>
       </div>
       <div class="signature-section">
-        <div class="signature-line"></div>
+        <img
+          src="{{ENTITY_SIGNATURE}}"
+          alt="Signature"
+          style="max-width: 150px; max-height: 60px; display: {{ENTITY_SIGNATURE_DISPLAY}};"
+        />
+        <div
+          class="signature-line"
+          style="display: {{ENTITY_SIGNATURE_DISPLAY_NONE}};"
+        ></div>
         <p class="authorised-sign">Authorised Sign</p>
       </div>
       <div class="footer-bar"></div>

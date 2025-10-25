@@ -263,6 +263,11 @@
       <header class="invoice-header">
         <div class="company-info">
           <div class="logo-box">
+            <img
+              src="{{ENTITY_LOGO}}"
+              alt="{{ENTITY_NAME}} Logo"
+              style="max-width: 100px; max-height: 60px; margin-bottom: 10px; display: {{ENTITY_LOGO_DISPLAY}};"
+            />
             <span class="brand-name">{{ENTITY_NAME}}</span>
             <p>{{ENTITY_EMAIL}}</p>
           </div>
@@ -348,7 +353,12 @@
               color: #555;
             "
           >
-            <p>signature</p>
+            <img
+              src="{{ENTITY_SIGNATURE}}"
+              alt="Signature"
+              style="max-width: 150px; max-height: 60px; display: {{ENTITY_SIGNATURE_DISPLAY}};"
+            />
+            <p style="margin-top: 5px">Authorized Signature</p>
           </div>
         </div>
       </div>

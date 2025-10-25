@@ -260,7 +260,11 @@
     <div class="invoice-container">
       <header class="invoice-header">
         <div class="logo">
-          <img src="{{ENTITY_LOGO}}" alt="{{ENTITY_NAME}} Logo" />
+          <img
+            src="{{ENTITY_LOGO}}"
+            alt="{{ENTITY_NAME}} Logo"
+            style="display: {{ENTITY_LOGO_DISPLAY}};"
+          />
           <div class="logo-text">
             <span class="logo-name">{{ENTITY_NAME}}</span>
             <span class="logo-tagline">{{ENTITY_EMAIL}}</span>
@@ -331,9 +335,19 @@
       </div>
 
       <div class="signature">
-        <p class="signature-line">Jonathan Smith</p>
-        <p class="signer-name">Jonathan Smith</p>
-        <p class="signer-title">Account Manager</p>
+        <img
+          src="{{ENTITY_SIGNATURE}}"
+          alt="Signature"
+          style="max-width: 150px; max-height: 60px; display: {{ENTITY_SIGNATURE_DISPLAY}};"
+        />
+        <p
+          class="signature-line"
+          style="display: {{ENTITY_SIGNATURE_DISPLAY_NONE}};"
+        >
+          {{ENTITY_NAME}}
+        </p>
+        <p class="signer-name">{{ENTITY_NAME}}</p>
+        <p class="signer-title">Authorized Signature</p>
       </div>
 
       <footer class="invoice-footer">

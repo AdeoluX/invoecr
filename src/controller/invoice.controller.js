@@ -199,6 +199,20 @@ class InvoiceController {
           "Clickable payment links",
         ],
       },
+      {
+        id: "invoice4",
+        name: "Modern Teal",
+        description:
+          "Professional design with dark teal/blue, white, and yellow/gold color scheme",
+        preview: "/invoice/templates/invoice4/preview",
+        features: [
+          "Modern teal color scheme",
+          "Professional layout",
+          "Curved decorative elements",
+          "Clean typography",
+          "Clickable payment links",
+        ],
+      },
     ];
 
     return successResponse(req, res, { templates });
@@ -274,6 +288,7 @@ class InvoiceController {
         invoice1: "invoice1",
         invoice2: "invoice2",
         invoice3: "invoice3",
+        invoice4: "invoice4",
       };
 
       const htmlTemplate = templateMapping[templateId] || "invoice1";

@@ -8,7 +8,7 @@ The HTML PDF generation system allows you to create professional PDF invoices us
 
 ## Features
 
-- **Three HTML Templates**: invoice1, invoice2, and invoice3
+- **Four HTML Templates**: invoice1, invoice2, invoice3, and invoice4
 - **Dynamic Data Replacement**: Automatically replaces placeholders with actual invoice data
 - **Playwright Integration**: Uses Playwright for reliable HTML to PDF conversion
 - **Template Flexibility**: Easy to customize and add new templates
@@ -32,6 +32,12 @@ The HTML PDF generation system allows you to create professional PDF invoices us
 - Contemporary design with orange accents
 - Clean typography and modern layout
 - Professional business appearance
+
+### invoice4.html
+
+- Modern design with dark teal/blue, white, and yellow/gold color scheme
+- Professional layout with curved decorative elements
+- Clean typography and modern styling
 
 ## Usage
 
@@ -59,7 +65,7 @@ GET /invoice/:code/html-pdf?template=invoice1&preview=true
 **Parameters:**
 
 - `code`: Invoice code/number
-- `template`: Template ID (invoice1, invoice2, invoice3) - defaults to invoice1
+- `template`: Template ID (invoice1, invoice2, invoice3, invoice4) - defaults to invoice1
 - `preview`: Set to true for inline viewing, false for download
 
 **Example:**
@@ -70,6 +76,9 @@ GET /invoice/INV-2024-001/html-pdf?template=invoice1
 
 # Preview PDF in browser
 GET /invoice/INV-2024-001/html-pdf?template=invoice2&preview=true
+
+# Generate PDF with invoice4 template
+GET /invoice/INV-2024-001/html-pdf?template=invoice4
 ```
 
 ### 3. Direct Service Usage
@@ -108,7 +117,11 @@ All templates support the following placeholders that are automatically replaced
 - `{{ENTITY_ADDRESS}}` - Business address
 - `{{ENTITY_PHONE}}` - Business phone
 - `{{ENTITY_EMAIL}}` - Business email
-- `{{ENTITY_LOGO}}` - Business logo URL
+- `{{ENTITY_LOGO}}` - Business logo URL (from entity.logo.secure_url)
+- `{{ENTITY_LOGO_DISPLAY}}` - Logo display CSS property (block/none)
+- `{{ENTITY_SIGNATURE}}` - Business signature URL (from entity.signature.secure_url)
+- `{{ENTITY_SIGNATURE_DISPLAY}}` - Signature display CSS property (block/none)
+- `{{ENTITY_SIGNATURE_DISPLAY_NONE}}` - Inverse signature display CSS property (none/block)
 
 ### Customer Data
 

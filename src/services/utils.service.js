@@ -10,6 +10,16 @@ const transactionRepo = require("../repo/transaction.repo");
 const invoiceRepo = require("../repo/invoice.repo");
 const CardService = require("./card.service");
 const crypto = require("crypto");
+const cloudinary = require("cloudinary").v2;
+const dotenv = require("dotenv");
+
+dotenv.config();
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 class UtilsService {
   static listAllBanks = async () => {
@@ -254,6 +264,19 @@ class UtilsService {
     console.log("📅 Subscription disabled:", data.reference);
     return {};
   }
+
+  static cloudinaryUpload = async (file, folder) => {
+    try {
+      const result = await cloudinary.uploader.upload(file, {
+        folder,
+        resource_type: "image",
+      });
+      return result;
+    } catch (error) {
+      console.error("Cloudinary upload error:", error);
+      return null;
+    }
+  };
 }
 
 module.exports = {

@@ -9,7 +9,7 @@ class HTMLPDFService {
    * @param {Object} entity - Entity data
    * @param {Object} customer - Customer data
    * @param {Object} subscriptionPlan - Subscription plan data
-   * @param {string} templateId - Template ID (invoice1, invoice2, invoice3)
+   * @param {string} templateId - Template ID (invoice1, invoice2, invoice3, invoice4)
    * @returns {Promise<Buffer>} PDF buffer
    */
   static async generateInvoicePdfFromHtml(
@@ -145,7 +145,15 @@ class HTMLPDFService {
       "{{ENTITY_ADDRESS}}": entity.address || "Business Address",
       "{{ENTITY_PHONE}}": entity.phone || "N/A",
       "{{ENTITY_EMAIL}}": entity.email || "N/A",
-      "{{ENTITY_LOGO}}": entity.logo || "",
+      "{{ENTITY_LOGO}}": entity.logo?.secure_url || "",
+      "{{ENTITY_LOGO_DISPLAY}}": entity.logo?.secure_url ? "block" : "none",
+      "{{ENTITY_SIGNATURE}}": entity.signature?.secure_url || "",
+      "{{ENTITY_SIGNATURE_DISPLAY}}": entity.signature?.secure_url
+        ? "block"
+        : "none",
+      "{{ENTITY_SIGNATURE_DISPLAY_NONE}}": entity.signature?.secure_url
+        ? "none"
+        : "block",
       "{{ENTITY_WEBSITE}}": entity.website || entity.email || "N/A",
 
       // Customer data
@@ -192,6 +200,13 @@ class HTMLPDFService {
       );
     } else if (templateId === "invoice3") {
       htmlContent = this.replaceInvoice3Data(
+        htmlContent,
+        invoice,
+        entity,
+        customer
+      );
+    } else if (templateId === "invoice4") {
+      htmlContent = this.replaceInvoice4Data(
         htmlContent,
         invoice,
         entity,
@@ -304,10 +319,18 @@ class HTMLPDFService {
   }
 
   /**
+   * Template-specific replacements for invoice4
+   */
+  static replaceInvoice4Data(htmlContent, invoice, entity, customer) {
+    // Add any template-specific replacements for invoice4
+    return htmlContent;
+  }
+
+  /**
    * Generate invoice PDF buffer for download using HTML templates
    * @param {string} invoiceId - Invoice ID
    * @param {string} entityId - Entity ID
-   * @param {string} templateId - Template ID (invoice1, invoice2, invoice3)
+   * @param {string} templateId - Template ID (invoice1, invoice2, invoice3, invoice4)
    * @returns {Promise<Buffer>} PDF buffer
    */
   static async generateInvoicePDFBuffer(

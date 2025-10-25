@@ -5,9 +5,8 @@ const httpStatus = require("http-status").default;
 const bankRepository = require("../repo/bankAccount.repo");
 const entityRepository = require("../repo/entity.repo");
 const { PaystackPaymentGateway } = require("../utils/paystack.utils");
-const jwt = require("jsonwebtoken");
-const Authorization = require("../utils/authorization.service");
 const SubscriptionService = require("./subscription.service");
+const { UtilsService } = require("./utils.service");
 
 class EntityService {
   static addBank = async ({
@@ -52,27 +51,41 @@ class EntityService {
     return allBanks;
   };
 
-  static addLogo = async (email, password) => {
-    const entity = await entityRepository.findOne({ query: { email } });
-    abortIf(!entity, httpStatus.NOT_FOUND, "Entity not found");
-    const isMatch = await bcrypt.compare(password, entity.password);
-    abortIf(!isMatch, httpStatus.BAD_REQUEST, "Invalid credentials");
-    const token = Authorization.generateToken({
-      id: entity._id,
-      email: entity.email,
-    });
-    return { entity, token };
+  static addLogo = async ({ file, entityId }) => {
+    const entity = await entityRepository.findOne({ query: { _id: entityId } });
+    abortIf(!entity, httpStatus.BAD_REQUEST, "Entity does not exist");
+    abortIf(!file, httpStatus.BAD_REQUEST, "Logo is required");
+    abortIf(
+      !["image/png", "image/jpg", "image/jpeg"].includes(file.mimetype),
+      httpStatus.BAD_REQUEST,
+      "Invalid file type"
+    );
+    const logo = await UtilsService.cloudinaryUpload(
+      file.tempFilePath,
+      `${entity.name.toLowerCase().split(" ").join("-")}`
+    );
+    abortIf(!logo, httpStatus.BAD_REQUEST, "Unable to upload logo");
+    entity.logo = logo;
+    await entity.save();
+    return {};
   };
-  static addSignature = async (email, password) => {
-    const entity = await entityRepository.findOne({ query: { email } });
-    abortIf(!entity, httpStatus.NOT_FOUND, "Entity not found");
-    const isMatch = await bcrypt.compare(password, entity.password);
-    abortIf(!isMatch, httpStatus.BAD_REQUEST, "Invalid credentials");
-    const token = Authorization.generateToken({
-      id: entity._id,
-      email: entity.email,
-    });
-    return { entity, token };
+  static addSignature = async ({ file, entityId }) => {
+    const entity = await entityRepository.findOne({ query: { _id: entityId } });
+    abortIf(!entity, httpStatus.BAD_REQUEST, "Entity does not exist");
+    abortIf(!file, httpStatus.BAD_REQUEST, "Signature is required");
+    abortIf(
+      !["image/png", "image/jpg", "image/jpeg"].includes(file.mimetype),
+      httpStatus.BAD_REQUEST,
+      "Invalid file type"
+    );
+    const signature = await UtilsService.cloudinaryUpload(
+      file.tempFilePath,
+      `${entity.name.toLowerCase().split(" ").join("-")}`
+    );
+    abortIf(!signature, httpStatus.BAD_REQUEST, "Unable to upload signature");
+    entity.signature = signature;
+    await entity.save();
+    return {};
   };
 
   static editEntity = async (data) => {

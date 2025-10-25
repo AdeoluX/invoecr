@@ -97,8 +97,8 @@ var entitySchema = new Schema(
     invoicesCreated: { type: Number, default: 0 },
     customersCreated: { type: Number, default: 0 },
     teamMembersCount: { type: Number, default: 1 },
-    logo: String,
-    signature: String,
+    logo: Object,
+    signature: Object,
     address: String,
     resetToken: {
       type: String,
