@@ -83,7 +83,7 @@ class AuthService {
     abortIf(!entity, httpStatus.NOT_FOUND, "Entity not found");
     const isMatch = await bcrypt.compare(password, entity.password);
     abortIf(!isMatch, httpStatus.BAD_REQUEST, "Invalid credentials");
-    new EmailBuilder().send("olaoluofficial@gmail.com", "login", {
+    new EmailBuilder().send(entity.email, "login", {
       userName: entity.first_name || entity.last_name || entity.name,
       loginTime: new Date().toLocaleString(),
       device: "Unknown",
