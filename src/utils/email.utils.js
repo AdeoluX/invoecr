@@ -27,7 +27,14 @@ class EmailBuilder {
       html,
     };
 
-    await this.transporter.sendMail(mailOptions);
+    this.transporter
+      .sendMail(mailOptions)
+      .then((info) => {
+        console.log("Email sent:", info.messageId);
+      })
+      .catch((error) => {
+        console.error("Error sending email:", error);
+      });
   }
 
   getDefaultSubject(template) {
