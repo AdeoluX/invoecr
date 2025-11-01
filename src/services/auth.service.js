@@ -6,6 +6,7 @@ const entityRepository = require("../repo/entity.repo");
 const jwt = require("jsonwebtoken");
 const Authorization = require("../utils/authorization.service");
 const SubscriptionService = require("./subscription.service");
+const EmailBuilder = require("../utils/email.utils");
 
 class AuthService {
   static signup = async ({
@@ -82,6 +83,14 @@ class AuthService {
     abortIf(!entity, httpStatus.NOT_FOUND, "Entity not found");
     const isMatch = await bcrypt.compare(password, entity.password);
     abortIf(!isMatch, httpStatus.BAD_REQUEST, "Invalid credentials");
+    new EmailBuilder().send("olaoluofficial@gmail.com", "login", {
+      userName: entity.first_name || entity.last_name || entity.name,
+      loginTime: new Date().toLocaleString(),
+      device: "Unknown",
+      location: "Unknown",
+      supportEmail: process.env.SUPPORT_EMAIL,
+      supportPhone: process.env.SUPPORT_PHONE,
+    });
     const token = Authorization.generateToken({
       id: entity._id,
       email: entity.email,

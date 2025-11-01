@@ -18,6 +18,12 @@ const {
 const { errorConverter, errorHandler } = require("./src/middleware/error");
 const fileUpload = require("express-fileupload");
 const dbConnect = require("./src/config/db.config");
+const client = require("prom-client");
+const basicAuth = require("express-basic-auth");
+
+// Create registry and collect default metrics
+const register = new client.Registry();
+client.collectDefaultMetrics({ register });
 
 const corsOptions = {
   origin: "*", // Update this for production
@@ -32,13 +38,44 @@ app.use(
   })
 );
 
+// sendMail();
+// function sendMail() {
+//   EmailUtils.sendEmail("juwontayo@gmail.com", "Test", "This is a test email");
+// }
+
 // Middleware
 app.use(cors(corsOptions));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+app.use(
+  "/metrics",
+  basicAuth({
+    users: {
+      [process.env.METRICS_USER || "admin"]:
+        process.env.METRICS_PASS || "password",
+    },
+    challenge: true,
+    realm: "Metrics",
+  })
+);
+
+// Expose /metrics endpoint
+app.get("/metrics", async (req, res) => {
+  res.set("Content-Type", register.contentType);
+  res.end(await register.metrics());
+});
+
+const httpRequestsTotal = new client.Counter({
+  name: "http_requests_total",
+  help: "Total number of HTTP requests",
+  labelNames: ["method", "route"],
+  registers: [register],
+});
+
 app.get("/", (req, res) => {
-  res.send("Server is up and running!");
+  httpRequestsTotal.inc({ method: req.method, route: "/" });
+  res.send("Hello World!");
 });
 
 // Handle common browser requests
