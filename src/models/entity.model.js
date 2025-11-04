@@ -43,27 +43,6 @@ var entitySchema = new Schema(
     // Nigeria-specific business fields
     businessType: {
       type: String,
-      enum: [
-        "freelancer",
-        "tailor",
-        "salon",
-        "caterer",
-        "mechanic",
-        "contractor",
-        "digital_marketing",
-        "creative_agency",
-        "it_consultant",
-        "ngo",
-        "church",
-        "restaurant",
-        "retail_shop",
-        "transport",
-        "healthcare",
-        "education",
-        "real_estate",
-        "manufacturing",
-        "other",
-      ],
       default: "freelancer",
     },
     country: {
