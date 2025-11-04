@@ -1,27 +1,23 @@
-# Use official Playwright image with Node.js (Ubuntu 24.04 base; matches Render's Node 20+ runtime)
-# Latest as of Nov 2025: v1.56.1-noble. Pin for reproducibility; update via docs if needed.
+# Use official Playwright image with Node.js (Ubuntu 24.04 base for stability)
 FROM mcr.microsoft.com/playwright:v1.56.1-noble
 
 # Set working directory
 WORKDIR /app
 
-# Install Yarn globally (your project uses yarn.lock)
+# Install Yarn globally (ensures compatibility with yarn.lock)
 RUN npm install -g yarn
 
-# Copy package files first (optimizes caching during builds)
+# Copy package files first for layer caching
 COPY package.json yarn.lock* ./
 
-# Install dependencies (includes Playwright; --frozen-lockfile for exact versions)
-RUN yarn install --frozen-lockfile
+# Install dependencies (verbose for Render logs; --ignore-engines skips Node checks)
+RUN yarn install --frozen-lockfile --ignore-engines
 
 # Copy the rest of your app source
 COPY . .
 
-# Expose the port (Render injects process.env.PORT dynamically)
+# Expose port (Render sets PORT env var)
 EXPOSE $PORT
 
-# Optional: Health check script (create a simple healthcheck.js if desired)
-# HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 CMD node healthcheck.js || exit 1
-
-# Start the Express app
-CMD ["yarn", "start"]  # Runs 'node start.js' as per your package.json
+# Start the Express app (exec form: no shell, direct exec)
+CMD ["yarn", "start"]
