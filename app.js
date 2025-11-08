@@ -86,10 +86,8 @@ app.use(
 // }
 
 // Middleware - CORS must be before other middleware
+// CORS middleware handles OPTIONS requests automatically
 app.use(cors(corsOptions));
-
-// Handle preflight requests explicitly
-app.options("*", cors(corsOptions));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 

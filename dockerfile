@@ -1,23 +1,38 @@
-# Use official Playwright image with Node.js (Ubuntu 24.04 base for stability)
-FROM mcr.microsoft.com/playwright:v1.55.0-noble
+# Use official Node.js LTS image
+FROM node:20-alpine
 
 # Set working directory
 WORKDIR /app
 
-# Install Yarn globally (ensures compatibility with yarn.lock)
+# Install system dependencies for Playwright and other tools
+RUN apk add --no-cache \
+    chromium \
+    nss \
+    freetype \
+    freetype-dev \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont \
+    && rm -rf /var/cache/apk/*
+
+# Set Playwright to use system Chromium
+ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+ENV PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium-browser
+
+# Install Yarn globally
 RUN npm install -g yarn
 
 # Copy package files first for layer caching
 COPY package.json yarn.lock* ./
 
-# Install dependencies (allow lockfile updates; --ignore-engines skips Node checks)
-RUN yarn install --ignore-engines --non-interactive
+# Install dependencies
+RUN yarn install --frozen-lockfile --production=false
 
 # Copy the rest of your app source
 COPY . .
 
 # Expose port (Render sets PORT env var)
-EXPOSE $PORT
+EXPOSE ${PORT:-5110}
 
-# Start the Express app (exec form: no shell, direct exec)
-CMD ["yarn", "start"]
+# Start the Express app
+CMD ["node", "start.js"]
