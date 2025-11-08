@@ -26,10 +26,51 @@ const basicAuth = require("express-basic-auth");
 const register = new client.Registry();
 client.collectDefaultMetrics({ register });
 
+// CORS configuration
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "http://127.0.0.1:3000",
+  "http://127.0.0.1:3001",
+  process.env.FRONTEND_URL,
+  process.env.NEXT_PUBLIC_APP_URL,
+].filter(Boolean);
+
 const corsOptions = {
-  origin: "*", // Update this for production
-  credentials: true,
-  optionSuccessStatus: 200,
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps, Postman, or curl requests)
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    // In development, allow all origins
+    if (process.env.NODE_ENV !== "production") {
+      return callback(null, true);
+    }
+
+    // In production, check against allowed origins or allow all for now
+    if (allowedOrigins.length === 0 || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      // For now, allow all origins in production (update for security)
+      callback(null, true);
+    }
+  },
+  credentials: false, // Set to false since we use JWT tokens in Authorization header
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+    "X-Requested-With",
+    "Accept",
+    "Origin",
+    "Access-Control-Request-Method",
+    "Access-Control-Request-Headers",
+  ],
+  exposedHeaders: ["Content-Range", "X-Content-Range"],
+  maxAge: 86400, // 24 hours - cache preflight requests
+  preflightContinue: false,
+  optionsSuccessStatus: 200,
 };
 
 app.use(
@@ -44,8 +85,11 @@ app.use(
 //   EmailUtils.sendEmail("juwontayo@gmail.com", "Test", "This is a test email");
 // }
 
-// Middleware
+// Middleware - CORS must be before other middleware
 app.use(cors(corsOptions));
+
+// Handle preflight requests explicitly
+app.options("*", cors(corsOptions));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
