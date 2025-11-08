@@ -67,7 +67,7 @@ class EntityService {
     abortIf(!logo, httpStatus.BAD_REQUEST, "Unable to upload logo");
     entity.logo = logo;
     await entity.save();
-    return {};
+    return { logo };
   };
   static addSignature = async ({ file, entityId }) => {
     const entity = await entityRepository.findOne({ query: { _id: entityId } });
@@ -84,6 +84,22 @@ class EntityService {
     );
     abortIf(!signature, httpStatus.BAD_REQUEST, "Unable to upload signature");
     entity.signature = signature;
+    await entity.save();
+    return { signature };
+  };
+
+  static removeLogo = async ({ entityId }) => {
+    const entity = await entityRepository.findOne({ query: { _id: entityId } });
+    abortIf(!entity, httpStatus.BAD_REQUEST, "Entity does not exist");
+    entity.logo = undefined;
+    await entity.save();
+    return {};
+  };
+
+  static removeSignature = async ({ entityId }) => {
+    const entity = await entityRepository.findOne({ query: { _id: entityId } });
+    abortIf(!entity, httpStatus.BAD_REQUEST, "Entity does not exist");
+    entity.signature = undefined;
     await entity.save();
     return {};
   };

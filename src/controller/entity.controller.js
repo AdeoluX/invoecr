@@ -36,6 +36,18 @@ class EntityController {
     return successResponse(req, res, entity, "Operation Successful");
   });
 
+  static removeLogo = catchAsync(async (req, res, next) => {
+    const { id } = req.user;
+    await EntityService.removeLogo({ entityId: id });
+    return successResponse(req, res, {}, "Logo removed successfully");
+  });
+
+  static removeSignature = catchAsync(async (req, res, next) => {
+    const { id } = req.user;
+    await EntityService.removeSignature({ entityId: id });
+    return successResponse(req, res, {}, "Signature removed successfully");
+  });
+
   static editEntity = catchAsync(async (req, res, next) => {
     const entity = req.user;
     const data = req.body;

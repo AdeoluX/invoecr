@@ -32,6 +32,16 @@ router.post(
   Authorization.authenticateToken,
   EntityController.addSignature
 );
+router.delete(
+  `${BASE}/remove-logo`,
+  Authorization.authenticateToken,
+  EntityController.removeLogo
+);
+router.delete(
+  `${BASE}/remove-signature`,
+  Authorization.authenticateToken,
+  EntityController.removeSignature
+);
 //entity
 router.patch(
   `${BASE}`,
