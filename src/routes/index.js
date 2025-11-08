@@ -6,6 +6,7 @@ const webHookRoute = require("./webhook.route");
 const subscriptionRoute = require("./subscription.route");
 const cardRoute = require("./card.route");
 const customerRoute = require("./customer.route");
+const inventoryRoute = require("./inventory.route");
 
 module.exports = {
   authRoute,
@@ -16,4 +17,5 @@ module.exports = {
   subscriptionRoute,
   cardRoute,
   customerRoute,
+  inventoryRoute,
 };

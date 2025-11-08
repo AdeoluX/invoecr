@@ -1,6 +1,6 @@
 const PDFDocument = require("pdfkit");
 const QRCode = require("qrcode");
-const { SubscriptionService } = require("./subscription.service");
+const SubscriptionService = require("./subscription.service");
 const HTMLPDFService = require("./htmlPdf.service");
 
 class PDFService {

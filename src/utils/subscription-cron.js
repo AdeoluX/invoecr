@@ -1,5 +1,5 @@
 const cron = require("node-cron");
-const { SubscriptionService } = require("../services/subscription.service");
+const SubscriptionService = require("../services/subscription.service");
 
 /**
  * Subscription Renewal Cron Jobs
