@@ -23,8 +23,8 @@ ENV PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium-browser
 # Copy package files first for layer caching
 COPY package.json yarn.lock* ./
 
-# Install dependencies
-RUN yarn install --frozen-lockfile --production=false
+# Install dependencies (allow lockfile updates if needed)
+RUN yarn install --production=false
 
 # Copy the rest of your app source
 COPY . .
