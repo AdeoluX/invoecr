@@ -16,15 +16,17 @@ RUN apk add --no-cache \
     yarn \
     && rm -rf /var/cache/apk/*
 
-# Set Playwright to use system Chromium
-ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
-ENV PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium-browser
+# Playwright will use its own installed browser
+# We install it explicitly above, so no need to skip download
 
 # Copy package files first for layer caching
 COPY package.json yarn.lock* ./
 
 # Install dependencies (allow lockfile updates if needed)
 RUN yarn install --production=false
+
+# Install Playwright Chromium browser (required for PDF generation)
+RUN npx playwright install chromium || yarn playwright install chromium || true
 
 # Copy the rest of your app source
 COPY . .

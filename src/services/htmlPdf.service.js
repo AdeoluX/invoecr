@@ -52,8 +52,44 @@ class HTMLPDFService {
         templateId
       );
 
-      // Launch browser
-      const browser = await chromium.launch();
+      // Launch browser - use system Chromium if available
+      const launchOptions = {
+        headless: true,
+        args: [
+          "--no-sandbox",
+          "--disable-setuid-sandbox",
+          "--disable-dev-shm-usage",
+          "--disable-accelerated-2d-canvas",
+          "--no-first-run",
+          "--no-zygote",
+          "--disable-gpu",
+          "--single-process", // Required for some Docker environments
+        ],
+      };
+
+      // Use system Chromium if environment variable is set and file exists
+      // Otherwise, Playwright will use its own installed browser
+      const chromiumPath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
+      if (chromiumPath) {
+        const fs = require("fs");
+        try {
+          // Verify the path exists before using it
+          if (fs.existsSync(chromiumPath)) {
+            launchOptions.executablePath = chromiumPath;
+            console.log(`Using system Chromium at ${chromiumPath}`);
+          } else {
+            console.warn(
+              `Chromium not found at ${chromiumPath}, using Playwright's browser`
+            );
+          }
+        } catch (error) {
+          console.warn(
+            `Error checking Chromium path: ${error.message}, using Playwright's browser`
+          );
+        }
+      }
+
+      const browser = await chromium.launch(launchOptions);
       const page = await browser.newPage();
 
       // Set viewport to A4 dimensions (210mm x 297mm)
