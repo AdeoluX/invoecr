@@ -54,6 +54,11 @@ const subscriptionPlanSchema = new Schema(
       taxReports: { type: Boolean, default: false },
       whiteLabel: { type: Boolean, default: false },
       apiAccess: { type: Boolean, default: false },
+      quotesAndEstimates: { type: Boolean, default: false },
+      smartReminders: { type: Boolean, default: false },
+      customerPortal: { type: Boolean, default: false },
+      expenseTracking: { type: Boolean, default: false },
+      premiumTemplates: { type: Boolean, default: false },
     },
     // Nigeria-specific features
     nigerianVAT: { type: Boolean, default: true },
@@ -71,7 +76,7 @@ const subscriptionPlanSchema = new Schema(
 // Pre-save hook to set default values based on plan
 subscriptionPlanSchema.pre("save", function (next) {
   if (this.name === "free") {
-    this.maxInvoices = 10;
+    this.maxInvoices = 5; // Growth Hack: 5 Invoices, Unlimited Quotes (handled in service)
     this.maxCustomers = 5;
     this.maxTeamMembers = 1;
     this.features = {
@@ -83,6 +88,11 @@ subscriptionPlanSchema.pre("save", function (next) {
       taxReports: false,
       whiteLabel: false,
       apiAccess: false,
+      quotesAndEstimates: true, // Free gets basic quotes
+      smartReminders: false,
+      customerPortal: false,
+      expenseTracking: false,
+      premiumTemplates: false,
     };
     this.price = 0;
     this.currency = "NGN";
@@ -99,6 +109,11 @@ subscriptionPlanSchema.pre("save", function (next) {
       taxReports: false,
       whiteLabel: false,
       apiAccess: false,
+      quotesAndEstimates: true,
+      smartReminders: false,
+      customerPortal: false,
+      expenseTracking: false,
+      premiumTemplates: true,
     };
     this.price = 2000; // ₦2,000/month
     this.currency = "NGN";
@@ -115,6 +130,11 @@ subscriptionPlanSchema.pre("save", function (next) {
       taxReports: true,
       whiteLabel: false,
       apiAccess: false,
+      quotesAndEstimates: true,
+      smartReminders: true,
+      customerPortal: false,
+      expenseTracking: true,
+      premiumTemplates: true,
     };
     this.price = 3500; // ₦3,500/month
     this.currency = "NGN";
@@ -131,6 +151,11 @@ subscriptionPlanSchema.pre("save", function (next) {
       taxReports: true,
       whiteLabel: true,
       apiAccess: true,
+      quotesAndEstimates: true,
+      smartReminders: true,
+      customerPortal: true,
+      expenseTracking: true,
+      premiumTemplates: true,
     };
     this.price = 5000; // ₦5,000/month
     this.currency = "NGN";

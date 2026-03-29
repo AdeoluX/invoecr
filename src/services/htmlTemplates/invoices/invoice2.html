@@ -3,372 +3,340 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Invoice</title>
+    <title>Invoice - Modern Red Refined</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-      @page {
-        size: A4;
-        margin: 0;
-      }
-
       body {
-        font-family: Arial, sans-serif;
+        font-family: 'Inter', sans-serif;
         margin: 0;
         padding: 0;
-        width: 210mm;
-        min-height: 297mm;
-        background-color: #f4f4f4;
-        box-sizing: border-box;
+        background-color: #fff;
+        color: #334155;
       }
 
       .invoice-container {
-        width: 100%;
-        height: 100vh;
+        width: 210mm;
         min-height: 297mm;
-        margin: 0;
-        background-color: #fff;
-        padding: 20mm;
-        box-shadow: none;
+        margin: 0 auto;
+        padding: 40px;
         box-sizing: border-box;
-        page-break-inside: avoid;
-        display: flex;
-        flex-direction: column;
       }
-      .invoice-header {
+
+      /* Crimson Accent Color */
+      :root {
+        --primary-red: #dc2626;
+        --secondary-red: #fef2f2;
+        --text-dark: #0f172a;
+        --text-muted: #64748b;
+        --border-color: #f1f5f9;
+      }
+
+      header {
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        margin-bottom: 30px;
+        margin-bottom: 50px;
       }
-      .logo {
+
+      .logo-section {
         display: flex;
         align-items: center;
       }
-      .logo img {
-        width: 40px;
-        height: 40px;
-        margin-right: 10px;
+
+      .logo-img {
+        max-width: 60px;
+        max-height: 60px;
+        margin-right: 15px;
       }
-      .logo-text .logo-name {
-        font-size: 24px;
-        font-weight: bold;
-        color: #cc0000;
-      }
-      .logo-text .logo-tagline {
-        font-size: 12px;
-        color: #666;
-      }
-      .invoice-details {
-        text-align: right;
-      }
-      .invoice-title {
-        font-size: 36px;
-        font-weight: bold;
-        color: #333;
-        margin: 0 0 10px;
-      }
-      .invoice-info p {
-        margin: 5px 0;
-        color: #666;
-        font-size: 14px;
-      }
-      .invoice-info span {
-        font-weight: bold;
-      }
-      .bill-to {
-        margin-bottom: 30px;
-        font-size: 14px;
-      }
-      .bill-to h3 {
-        margin: 0 0 5px;
-        font-size: 16px;
-        color: #555;
-        font-weight: normal;
-      }
-      .bill-to-name {
-        font-weight: bold;
-        font-size: 18px;
-        color: #333;
-        margin: 0 0 10px;
-      }
-      .invoice-table {
-        border-collapse: collapse;
-        width: 100%;
-        flex-grow: 1;
-        margin-top: 20px;
-      }
-      .table-header {
-        display: flex;
-        background-color: #cc0000;
-        color: #fff;
-        padding: 10px 20px;
-        font-weight: bold;
-      }
-      .table-header div {
-        flex: 1;
-        text-align: left;
-      }
-      .table-header .item-description {
-        flex: 4;
-      }
-      .table-row {
-        display: flex;
-        align-items: center;
-        padding: 15px 20px;
-        border-bottom: 1px solid #eee;
-      }
-      .table-row:nth-child(even) {
-        background-color: #f9f9f9;
-      }
-      .table-row h4 {
+
+      .company-name {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--text-dark);
         margin: 0;
-        font-size: 16px;
-        color: #333;
       }
-      .table-row p {
-        margin: 5px 0 0;
+
+      .company-tagline {
         font-size: 12px;
-        color: #666;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
       }
-      .table-row .item-description {
-        flex: 4;
-      }
-      .table-row .price,
-      .table-row .qty,
-      .table-row .total {
-        flex: 1;
-        font-size: 14px;
-        text-align: left;
-      }
-      .payment-info-summary {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-top: 30px;
-      }
-      .payment-info {
-        width: 45%;
-      }
-      .payment-info h4 {
-        background-color: #cc0000;
-        color: #fff;
-        padding: 8px 15px;
-        margin: 0 0 10px;
-      }
-      .payment-info p {
-        margin: 5px 0;
-        font-size: 14px;
-        color: #555;
-      }
-      .summary {
-        width: 45%;
+
+      .invoice-title-block {
         text-align: right;
       }
+
+      .invoice-title {
+        font-size: 42px;
+        font-weight: 700;
+        color: var(--primary-red);
+        margin: 0 0 10px 0;
+        line-height: 1;
+      }
+
+      .meta-info p {
+        margin: 5px 0;
+        font-size: 14px;
+        color: var(--text-muted);
+      }
+
+      .meta-info span {
+        font-weight: 700;
+        color: var(--text-dark);
+      }
+
+      .address-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        margin-bottom: 50px;
+        padding: 20px;
+        background-color: var(--secondary-red);
+        border-radius: 8px;
+        border-left: 4px solid var(--primary-red);
+      }
+
+      .address-block h4 {
+        margin: 0 0 10px 0;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--primary-red);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .address-block p {
+        margin: 4px 0;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .customer-name {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 5px;
+      }
+
+      .items-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 40px;
+      }
+
+      .items-table thead th {
+        text-align: left;
+        padding: 15px 10px;
+        background-color: var(--text-dark);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+
+      .items-table tbody td {
+        padding: 18px 10px;
+        border-bottom: 1px solid var(--border-color);
+        font-size: 14px;
+      }
+
+      .items-table .text-right {
+        text-align: right;
+      }
+
+      .items-table .total-col {
+        font-weight: 700;
+        color: var(--text-dark);
+      }
+
+      .summary-section {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 60px;
+      }
+
+      .payment-box {
+        width: 45%;
+      }
+
+      .payment-box h4 {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0 0 10px 0;
+        border-bottom: 2px solid var(--primary-red);
+        display: inline-block;
+        padding-bottom: 3px;
+      }
+
+      .payment-box p {
+        font-size: 13px;
+        color: var(--text-muted);
+        line-height: 1.6;
+        margin: 5px 0;
+      }
+
+      .totals-box {
+        width: 40%;
+      }
+
       .summary-row {
         display: flex;
         justify-content: space-between;
-        margin-bottom: 10px;
-        font-size: 16px;
-      }
-      .summary-row span:last-child {
-        font-weight: bold;
-      }
-      .grand-total-row {
-        background-color: #cc0000;
-        color: #fff;
-        padding: 10px 15px;
-        display: flex;
-        justify-content: space-between;
-        font-size: 20px;
-        font-weight: bold;
-      }
-      .grand-total-row .grand-total-label {
-        text-transform: uppercase;
-      }
-      .thank-you {
-        margin-top: 30px;
+        padding: 8px 0;
         font-size: 14px;
-        color: #333;
       }
-      .thank-you .terms {
-        font-size: 12px;
-        color: #666;
+
+      .summary-row.grand-total {
+        margin-top: 15px;
+        padding: 15px;
+        background-color: var(--primary-red);
+        color: #fff;
+        border-radius: 4px;
+        font-size: 18px;
+        font-weight: 700;
       }
-      .signature {
+
+      .signature-section {
         text-align: right;
-        margin-top: 20px;
       }
-      .signature-line {
-        font-family: "Dancing Script", cursive;
-        font-size: 24px;
+
+      .signature-img {
+        max-width: 150px;
+        max-height: 60px;
+        margin-bottom: 5px;
+      }
+
+      .signature-name {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text-dark);
         margin: 0;
       }
-      .signer-name {
-        font-weight: bold;
-        margin: 5px 0 0;
-      }
-      .signer-title {
+
+      .signature-title {
         font-size: 12px;
-        color: #666;
+        color: var(--text-muted);
         margin: 0;
       }
-      .invoice-footer {
+
+      footer {
+        margin-top: auto;
+        padding-top: 40px;
+        border-top: 2px solid var(--primary-red);
         display: flex;
         justify-content: space-between;
-        align-items: center;
-        background-color: #cc0000;
-        color: #fff;
-        padding: 15px 40px;
-        margin-top: 30px;
-      }
-      .contact-info {
-        display: flex;
-      }
-      .contact-item {
-        display: flex;
-        align-items: center;
-        margin-right: 30px;
-      }
-      .contact-item img {
-        width: 20px;
-        height: 20px;
-        filter: invert(1);
-        margin-right: 10px;
-      }
-      .contact-item p {
-        margin: 0;
         font-size: 12px;
-        line-height: 1.4;
+        color: var(--text-muted);
       }
-      .contact-item a {
-        color: #fff;
-        text-decoration: none;
-      }
-      .address-footer {
-        display: flex;
-        align-items: center;
-        font-size: 12px;
-      }
-      .address-footer img {
-        width: 15px;
-        height: 15px;
-        filter: invert(1);
-        margin-right: 5px;
+
+      .footer-contact p {
+        margin: 2px 0;
       }
     </style>
   </head>
   <body>
     <div class="invoice-container">
-      <header class="invoice-header">
-        <div class="logo">
+      <header>
+        <div class="logo-section">
           <img
             src="{{ENTITY_LOGO}}"
-            alt="{{ENTITY_NAME}} Logo"
-            style="display: {{ENTITY_LOGO_DISPLAY}};"
+            alt="Logo"
+            class="logo-img"
+            style="{{ENTITY_LOGO_STYLE}}"
           />
           <div class="logo-text">
-            <span class="logo-name">{{ENTITY_NAME}}</span>
-            <span class="logo-tagline">{{ENTITY_EMAIL}}</span>
+            <h2 class="company-name">{{ENTITY_NAME}}</h2>
+            <p class="company-tagline">{{ENTITY_WEBSITE}}</p>
           </div>
         </div>
-        <div class="invoice-details">
-          <h1 class="invoice-title">INVOICE</h1>
-          <div class="invoice-info">
-            <p>Invoice No: <span>{{INVOICE_NUMBER}}</span></p>
-            <p>Account No: <span>{{ENTITY_PHONE}}</span></p>
+        <div class="invoice-title-block">
+          <h1 class="invoice-title">{{DOCUMENT_TITLE}}</h1>
+          <div class="meta-info">
+            <p>{{DOCUMENT_NUMBER_LABEL}} <span>#{{INVOICE_NUMBER}}</span></p>
             <p>Date: <span>{{INVOICE_DATE}}</span></p>
           </div>
         </div>
       </header>
 
-      <div class="bill-to">
-        <h3>INVOICE TO:</h3>
-        <p class="bill-to-name">{{CUSTOMER_NAME}}</p>
-        <p>Add: {{CUSTOMER_ADDRESS}}</p>
-        <p>Pho: {{CUSTOMER_PHONE}}</p>
-        <p>Email: {{CUSTOMER_EMAIL}}</p>
+      <div class="address-section">
+        <div class="address-block">
+          <h4>From</h4>
+          <p class="company-name" style="font-size: 16px;">{{ENTITY_NAME}}</p>
+          <p>{{ENTITY_ADDRESS}}</p>
+          <p>{{ENTITY_PHONE}}</p>
+          <p>{{ENTITY_EMAIL}}</p>
+        </div>
+        <div class="address-block">
+          <h4>{{BILL_TO_LABEL}}</h4>
+          <p class="customer-name">{{CUSTOMER_NAME}}</p>
+          <p>{{CUSTOMER_ADDRESS}}</p>
+          <p>{{CUSTOMER_PHONE}}</p>
+          <p>{{CUSTOMER_EMAIL}}</p>
+        </div>
       </div>
 
-      <div class="invoice-table">
-        <div class="table-header">
-          <div class="item-description">ITEM DESCRIPTION</div>
-          <div class="price">PRICE</div>
-          <div class="qty">QTY</div>
-          <div class="total">TOTAL</div>
-        </div>
-        <div class="table-body">{{ITEMS_TABLE}}</div>
-      </div>
+      <table class="items-table">
+        <thead>
+          <tr>
+            <th style="width: 60%">Item Description</th>
+            <th class="text-right">Price</th>
+            <th class="text-right">Qty</th>
+            <th class="text-right">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{ITEMS_TABLE}}
+        </tbody>
+      </table>
 
-      <div class="payment-info-summary">
-        <div class="payment-info">
-          <h4>PAYMENT INFO</h4>
-          <p>Email: <a href="mailto:{{ENTITY_EMAIL}}">{{ENTITY_EMAIL}}</a></p>
-          <p>
-            Payment:
-            <a
-              href="{{PAYMENT_LINK}}"
-              target="_blank"
-              style="color: #cc0000; text-decoration: none; font-weight: bold"
-              >Click here to pay</a
-            >
-          </p>
-          <p>Status: {{PAYMENT_STATUS}}</p>
+      <div class="summary-section">
+        <div class="payment-box">
+          <section style="{{PAYMENT_INFO_STYLE}}">
+            <h4>How to Pay</h4>
+            <p>Please use our secure checkout link for instant payment:</p>
+            <p><a href="{{PAYMENT_LINK}}" style="color: var(--primary-red); font-weight: 700; text-decoration: none;">Pay Online Now &rarr;</a></p>
+          </section>
+          <section style="margin-top: 20px;">
+            <h4>Terms & Notes</h4>
+            <p>{{PAYMENT_TERMS}}</p>
+            <p>{{NOTES}}</p>
+          </section>
         </div>
-        <div class="summary">
+        <div class="totals-box">
           <div class="summary-row">
-            <span>Sub Total</span>
+            <span>Subtotal</span>
             <span>{{SUBTOTAL}}</span>
           </div>
           <div class="summary-row">
-            <span>Tax: VAT {{TAX_RATE}}</span>
+            <span>Tax ({{TAX_RATE}})</span>
             <span>{{TAX_AMOUNT}}</span>
           </div>
-          <div class="grand-total-row">
-            <span class="grand-total-label">GRAND TOTAL</span>
-            <span class="grand-total-value">{{TOTAL}}</span>
+          <div class="summary-row grand-total">
+            <span>Total Amount</span>
+            <span>{{TOTAL}}</span>
+          </div>
+
+          <div class="signature-section" style="margin-top: 40px;">
+            <img
+              src="{{ENTITY_SIGNATURE}}"
+              alt="Signature"
+              class="signature-img"
+              style="{{ENTITY_SIGNATURE_STYLE}}"
+            />
+            <p class="signature-name">{{ENTITY_NAME}}</p>
+            <p class="signature-title">Authorized Officer</p>
           </div>
         </div>
       </div>
 
-      <div class="thank-you">
-        <p>Thank you for your business!</p>
-        <p class="terms">TERMS: {{NOTES}}</p>
-      </div>
-
-      <div class="signature">
-        <img
-          src="{{ENTITY_SIGNATURE}}"
-          alt="Signature"
-          style="max-width: 150px; max-height: 60px; display: {{ENTITY_SIGNATURE_DISPLAY}};"
-        />
-        <p
-          class="signature-line"
-          style="display: {{ENTITY_SIGNATURE_DISPLAY_NONE}};"
-        >
-          {{ENTITY_NAME}}
-        </p>
-        <p class="signer-name">{{ENTITY_NAME}}</p>
-        <p class="signer-title">Authorized Signature</p>
-      </div>
-
-      <footer class="invoice-footer">
-        <div class="contact-info">
-          <div class="contact-item">
-            <img src="https://i.imgur.com/K1n898y.png" alt="Phone icon" />
-            <p>000 123 456 789 12<br />000 123 456 789 12</p>
-          </div>
-          <div class="contact-item">
-            <img src="https://i.imgur.com/4bF58mP.png" alt="Email icon" />
-            <p>
-              <a href="mailto:urname@gmail.com">urname@gmail.com</a><br /><a
-                href="http://www.urwebsite.com"
-                >www.urwebsite.com</a
-              >
-            </p>
-          </div>
+      <footer>
+        <div class="footer-contact">
+          <p>{{ENTITY_NAME}} &bull; {{ENTITY_EMAIL}}</p>
         </div>
-        <div class="address-footer">
-          <img src="https://i.imgur.com/tYt6Cj5.png" alt="Location pin icon" />
-          <p>Street Address Here Avenue : 1234578</p>
+        <div class="footer-thanks">
+          THANK YOU FOR DOING BUSINESS WITH US
         </div>
       </footer>
     </div>

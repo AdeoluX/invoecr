@@ -10,6 +10,11 @@ var invoiceSchema = new mongoose.Schema(
         return "inv_" + crypto.randomUUID().split("-").join("").slice(0, 17); // Adjusted to use a regular function instead of an arrow function
       },
     },
+    type: {
+      type: String,
+      enum: ["invoice", "quote"],
+      default: "invoice",
+    },
     currency: {
       type: String,
       required: true,

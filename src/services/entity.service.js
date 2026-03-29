@@ -104,6 +104,11 @@ class EntityService {
     return {};
   };
 
+  static getEntity = async (id) => {
+    const entity = await entityRepository.findById(id);
+    abortIf(!entity, httpStatus.BAD_REQUEST, "Entity does not exist");
+    return entity;
+  };
   static editEntity = async (data) => {
     const entity = await entityRepository.findById(data.entity.id);
     abortIf(!entity, httpStatus.BAD_REQUEST, "Invalid Entity Id");

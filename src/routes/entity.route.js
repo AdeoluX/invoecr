@@ -10,7 +10,11 @@ const {
 const router = express.Router();
 
 const BASE = "/entity";
-
+router.get(
+  `${BASE}`,
+  Authorization.authenticateToken,
+  EntityController.getEntity
+);
 router.post(
   `${BASE}/add-bank`,
   validateReq(addBankSchema),

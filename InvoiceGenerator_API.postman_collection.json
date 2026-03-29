@@ -1,0 +1,1477 @@
+{
+  "info": {
+    "_postman_id": "invoice-generator-nigeria-api",
+    "name": "Invoice Generator Nigeria API",
+    "description": "Complete API collection for Invoice Generator Nigeria - A Nigeria-focused invoice generator with WhatsApp integration and Paystack payments.\n\n## Authentication\nMost endpoints require JWT Bearer token authentication. Use the Sign In endpoint to get a token, then set it in the collection variables.\n\n## Base URL\n- Production: https://invoecr-1.onrender.com/api/v1\n- Development: http://localhost:5000/api/v1",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://invoecr-1.onrender.com/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "invoiceCode",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "customerId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "inventoryId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "cardId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "description": "User authentication endpoints for sign up and sign in.",
+      "item": [
+        {
+          "name": "Sign Up",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.success && jsonData.data.token) {",
+                  "    pm.collectionVariables.set('token', jsonData.data.token);",
+                  "    console.log('Token saved to collection variables');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"My Business Name\",\n    \"email\": \"business@example.com\",\n    \"password\": \"SecurePassword123!\",\n    \"confirm_password\": \"SecurePassword123!\",\n    \"type\": \"business\",\n    \"phone\": \"+2348012345678\",\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\",\n    \"address\": \"123 Business Street, Lagos, Nigeria\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/sign-up",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "sign-up"]
+            },
+            "description": "Create a new user account.\n\n**Required Fields:**\n- name: Business/User name\n- email: Valid email address\n- password: Strong password\n- confirm_password: Must match password\n\n**Optional Fields:**\n- type: 'business', 'staff', or 'individual'\n- phone: Phone number\n- first_name, last_name: Personal names\n- logo: URL to logo image\n- address: Business address"
+          },
+          "response": []
+        },
+        {
+          "name": "Sign In",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.success && jsonData.data.token) {",
+                  "    pm.collectionVariables.set('token', jsonData.data.token);",
+                  "    console.log('Token saved to collection variables');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"business@example.com\",\n    \"password\": \"SecurePassword123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/sign-in",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "sign-in"]
+            },
+            "description": "Authenticate an existing user and receive a JWT token.\n\nThe token is automatically saved to collection variables for use in other requests."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Invoice",
+      "description": "Invoice management endpoints - create, read, update, delete invoices, generate PDFs, and share via WhatsApp.",
+      "item": [
+        {
+          "name": "Create Invoice",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.success && jsonData.data.invoiceNumber) {",
+                  "    pm.collectionVariables.set('invoiceCode', jsonData.data.invoiceNumber);",
+                  "    console.log('Invoice code saved:', jsonData.data.invoiceNumber);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"customer\": {\n        \"name\": \"John Customer\",\n        \"email\": \"customer@example.com\",\n        \"phone\": \"+2348098765432\",\n        \"address\": \"456 Customer Avenue, Lagos\",\n        \"companyName\": \"Customer Company Ltd\"\n    },\n    \"items\": [\n        {\n            \"name\": \"Web Development Service\",\n            \"description\": \"Full stack web application development\",\n            \"quantity\": 1,\n            \"unitPrice\": 500000\n        },\n        {\n            \"name\": \"UI/UX Design\",\n            \"description\": \"User interface and experience design\",\n            \"quantity\": 2,\n            \"unitPrice\": 150000\n        }\n    ],\n    \"currency\": \"NGN\",\n    \"issueDate\": \"2024-01-15\",\n    \"dueDate\": \"2024-02-15\",\n    \"status\": \"draft\",\n    \"notes\": \"Thank you for your business!\",\n    \"terms\": \"Payment due within 30 days\",\n    \"subtotal\": 800000,\n    \"tax\": 60000,\n    \"template\": \"invoice1\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/invoice",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoice"]
+            },
+            "description": "Create a new invoice.\n\n**Note:** Either `customer_id` (existing customer) OR `customer` object (new customer) is required.\n\n**Templates available:**\n- pdf0, pdf1, pdf2, pdf3 (legacy)\n- invoice1, invoice2, invoice3 (HTML templates)"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Invoice (Existing Customer)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.success && jsonData.data.invoiceNumber) {",
+                  "    pm.collectionVariables.set('invoiceCode', jsonData.data.invoiceNumber);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"customer_id\": \"{{customerId}}\",\n    \"items\": [\n        {\n            \"name\": \"Consulting Service\",\n            \"description\": \"Business consulting session\",\n            \"quantity\": 4,\n            \"unitPrice\": 50000\n        }\n    ],\n    \"currency\": \"NGN\",\n    \"issueDate\": \"2024-01-15\",\n    \"dueDate\": \"2024-02-15\",\n    \"subtotal\": 200000,\n    \"template\": \"invoice2\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/invoice",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoice"]
+            },
+            "description": "Create invoice for an existing customer using their ID."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Invoices",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/invoice?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoice"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Items per page"
+                },
+                {
+                  "key": "status",
+                  "value": "draft",
+                  "description": "Filter by status: draft, sent, published",
+                  "disabled": true
+                },
+                {
+                  "key": "paymentStatus",
+                  "value": "unpaid",
+                  "description": "Filter by payment: unpaid, paid, overdue, partially-paid",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Search by invoice number or customer name",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get all invoices for the authenticated entity with pagination and filters."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Single Invoice",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/invoice/{{invoiceCode}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoice", "{{invoiceCode}}"]
+            },
+            "description": "Get a specific invoice by its invoice number (code)."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Invoice",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\": \"published\",\n    \"notes\": \"Updated notes - Thank you for your business!\",\n    \"dueDate\": \"2024-03-01\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/invoice/{{invoiceCode}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoice", "{{invoiceCode}}"]
+            },
+            "description": "Update an existing invoice. All fields are optional."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Invoice",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/invoice/{{invoiceCode}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoice", "{{invoiceCode}}"]
+            },
+            "description": "Delete an invoice by ID."
+          },
+          "response": []
+        },
+        {
+          "name": "Download Invoice Data",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/invoice/{{invoiceCode}}/download",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoice", "{{invoiceCode}}", "download"]
+            },
+            "description": "Download invoice data for display purposes."
+          },
+          "response": []
+        },
+        {
+          "name": "Download Invoice PDF",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/invoice/{{invoiceCode}}/pdf?preview=false&template=invoice1",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoice", "{{invoiceCode}}", "pdf"],
+              "query": [
+                {
+                  "key": "preview",
+                  "value": "false",
+                  "description": "true = display inline, false = download"
+                },
+                {
+                  "key": "template",
+                  "value": "invoice1",
+                  "description": "Template: invoice1, invoice2, invoice3, pdf0, pdf1, pdf2, pdf3"
+                }
+              ]
+            },
+            "description": "Download invoice as PDF file."
+          },
+          "response": []
+        },
+        {
+          "name": "Download Invoice HTML PDF",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/invoice/{{invoiceCode}}/html-pdf?preview=true&template=invoice2",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoice", "{{invoiceCode}}", "html-pdf"],
+              "query": [
+                {
+                  "key": "preview",
+                  "value": "true",
+                  "description": "true = display inline in browser"
+                },
+                {
+                  "key": "template",
+                  "value": "invoice2",
+                  "description": "HTML Template: invoice1, invoice2, invoice3"
+                }
+              ]
+            },
+            "description": "Download invoice as PDF using HTML templates."
+          },
+          "response": []
+        },
+        {
+          "name": "Initiate Payment",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/invoice/{{invoiceCode}}/initiate-payment",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoice", "{{invoiceCode}}", "initiate-payment"]
+            },
+            "description": "Initiate a Paystack payment for an invoice. Redirects to Paystack checkout."
+          },
+          "response": []
+        },
+        {
+          "name": "Share via WhatsApp",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"customerPhone\": \"+2348012345678\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/invoice/{{invoiceCode}}/share-whatsapp",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoice", "{{invoiceCode}}", "share-whatsapp"]
+            },
+            "description": "Share invoice link via WhatsApp using Termii API."
+          },
+          "response": []
+        },
+        {
+          "name": "Share PDF via WhatsApp",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"customerPhone\": \"+2348012345678\",\n    \"pdfUrl\": \"https://res.cloudinary.com/xxx/invoice.pdf\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/invoice/{{invoiceCode}}/share-pdf-whatsapp",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoice", "{{invoiceCode}}", "share-pdf-whatsapp"]
+            },
+            "description": "Share PDF invoice via WhatsApp as a media message."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Dashboard Summary",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/invoice/dashboard",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoice", "dashboard"]
+            },
+            "description": "Get dashboard analytics summary including total invoices, revenue, and monthly trends."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Invoice Analytics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/invoice/analytics",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoice", "analytics"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01",
+                  "disabled": true
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-12-31",
+                  "disabled": true
+                },
+                {
+                  "key": "groupBy",
+                  "value": "month",
+                  "description": "Group by: day, week, month",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get detailed invoice analytics with date range and grouping options."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Available Templates",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/invoice/templates",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoice", "templates"]
+            },
+            "description": "Get list of available invoice templates with descriptions and features."
+          },
+          "response": []
+        },
+        {
+          "name": "Preview Template",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/invoice/templates/invoice1/preview",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoice", "templates", "invoice1", "preview"]
+            },
+            "description": "Preview a specific template with sample data. Returns a PDF."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Customer",
+      "description": "Customer management endpoints - CRUD operations for customers.",
+      "item": [
+        {
+          "name": "Create Customer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.success && jsonData.data._id) {",
+                  "    pm.collectionVariables.set('customerId', jsonData.data._id);",
+                  "    console.log('Customer ID saved:', jsonData.data._id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Ade Johnson\",\n    \"email\": \"ade.johnson@example.com\",\n    \"phone\": \"+2348012345678\",\n    \"address\": \"123 Victoria Island, Lagos, Nigeria\",\n    \"companyName\": \"Johnson Enterprises Ltd\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/customer",
+              "host": ["{{baseUrl}}"],
+              "path": ["customer"]
+            },
+            "description": "Create a new customer.\n\n**Required:** name (2-100 characters)\n\n**Optional:** email, phone, address, companyName"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Customers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/customer?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["customer"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Search by name, email, or company",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get all customers for the authenticated entity."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Single Customer",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/customer/{{customerId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["customer", "{{customerId}}"]
+            },
+            "description": "Get a specific customer by ID."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Customer",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Ade Johnson Updated\",\n    \"phone\": \"+2348098765432\",\n    \"address\": \"456 Lekki Phase 1, Lagos, Nigeria\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/customer/{{customerId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["customer", "{{customerId}}"]
+            },
+            "description": "Update an existing customer. All fields are optional."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Customer",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/customer/{{customerId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["customer", "{{customerId}}"]
+            },
+            "description": "Delete a customer by ID."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Entity",
+      "description": "Entity (Business) management endpoints - profile updates, bank accounts, logo/signature uploads.",
+      "item": [
+        {
+          "name": "Update Entity Profile",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"My Updated Business Name\",\n    \"phone\": \"+2348012345678\",\n    \"address\": \"123 Business Avenue, Lagos, Nigeria\",\n    \"state\": \"Lagos\",\n    \"city\": \"Ikeja\",\n    \"whatsappNumber\": \"+2348012345678\",\n    \"businessType\": \"digital_marketing\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/entity",
+              "host": ["{{baseUrl}}"],
+              "path": ["entity"]
+            },
+            "description": "Update entity profile.\n\n**Business Types:**\nfreelancer, tailor, salon, caterer, mechanic, contractor, digital_marketing, creative_agency, it_consultant, ngo, church, restaurant, retail_shop, transport, healthcare, education, real_estate, manufacturing, other"
+          },
+          "response": []
+        },
+        {
+          "name": "Add Bank Account",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"accountNumber\": \"0123456789\",\n    \"bankCode\": \"044\",\n    \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/entity/add-bank",
+              "host": ["{{baseUrl}}"],
+              "path": ["entity", "add-bank"]
+            },
+            "description": "Add a bank account for receiving payments.\n\nUse the /utils/get-banks endpoint to get the list of bank codes."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Bank Accounts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/entity/get-banks",
+              "host": ["{{baseUrl}}"],
+              "path": ["entity", "get-banks"]
+            },
+            "description": "Get all bank accounts for the entity."
+          },
+          "response": []
+        },
+        {
+          "name": "Add Logo",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "logo",
+                  "type": "file",
+                  "src": "",
+                  "description": "Logo image (JPEG/PNG, max 3MB)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/entity/add-logo",
+              "host": ["{{baseUrl}}"],
+              "path": ["entity", "add-logo"]
+            },
+            "description": "Upload a business logo. Accepts JPEG or PNG, max 3MB."
+          },
+          "response": []
+        },
+        {
+          "name": "Add Signature",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "signature",
+                  "type": "file",
+                  "src": "",
+                  "description": "Signature image (JPEG/PNG, max 3MB)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/entity/add-signature",
+              "host": ["{{baseUrl}}"],
+              "path": ["entity", "add-signature"]
+            },
+            "description": "Upload a business signature. Accepts JPEG or PNG, max 3MB."
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Logo",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/entity/remove-logo",
+              "host": ["{{baseUrl}}"],
+              "path": ["entity", "remove-logo"]
+            },
+            "description": "Remove the business logo."
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Signature",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/entity/remove-signature",
+              "host": ["{{baseUrl}}"],
+              "path": ["entity", "remove-signature"]
+            },
+            "description": "Remove the business signature."
+          },
+          "response": []
+        },
+        {
+          "name": "Add Team Member",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"first_name\": \"Jane\",\n    \"last_name\": \"Smith\",\n    \"email\": \"jane.smith@example.com\",\n    \"type\": \"staff\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/entity/add-member",
+              "host": ["{{baseUrl}}"],
+              "path": ["entity", "add-member"]
+            },
+            "description": "Add a team member to the entity."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Subscription",
+      "description": "Subscription management endpoints - plans, upgrades, limits, and renewals.",
+      "item": [
+        {
+          "name": "Get Available Plans",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/subscription/plans",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription", "plans"]
+            },
+            "description": "Get all available subscription plans. No authentication required.\n\n**Plans:**\n- Free: 10 invoices/month, 5 customers\n- Basic (₦2,000/mo): Unlimited invoices/customers\n- Premium (₦3,500/mo): + Analytics, recurring invoices\n- Enterprise (₦5,000/mo): + White-label, API access"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Plan Comparison",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/subscription/comparison",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription", "comparison"]
+            },
+            "description": "Get subscription plans comparison data for pricing page."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Current Subscription",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/subscription/current",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription", "current"]
+            },
+            "description": "Get the authenticated entity's current subscription details."
+          },
+          "response": []
+        },
+        {
+          "name": "Check Subscription Limits",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/subscription/limits",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription", "limits"]
+            },
+            "description": "Check current usage against subscription limits."
+          },
+          "response": []
+        },
+        {
+          "name": "Check Feature Access",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/subscription/feature/analytics",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription", "feature", "analytics"]
+            },
+            "description": "Check if a specific feature is available.\n\n**Features:**\nwhatsappSharing, pdfExport, onlinePayments, analytics, recurringInvoices, taxReports, whiteLabel, apiAccess"
+          },
+          "response": []
+        },
+        {
+          "name": "Check Payment Readiness",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/subscription/payment-readiness?planName=premium",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription", "payment-readiness"],
+              "query": [
+                {
+                  "key": "planName",
+                  "value": "premium"
+                }
+              ]
+            },
+            "description": "Check if user has saved cards for subscription upgrade."
+          },
+          "response": []
+        },
+        {
+          "name": "Upgrade Subscription",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"planName\": \"premium\",\n    \"cardId\": \"{{cardId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscription/upgrade",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription", "upgrade"]
+            },
+            "description": "Upgrade to a higher subscription plan.\n\nRequires a saved card for payment."
+          },
+          "response": []
+        },
+        {
+          "name": "Downgrade Subscription",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"planName\": \"basic\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscription/downgrade",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription", "downgrade"]
+            },
+            "description": "Downgrade to a lower subscription plan."
+          },
+          "response": []
+        },
+        {
+          "name": "Renew Subscription",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"cardId\": \"{{cardId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscription/renew",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription", "renew"]
+            },
+            "description": "Renew the current subscription. CardId is optional - uses default card if not specified."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Renewal Status (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/subscription/renewal-status?daysAhead=7",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription", "renewal-status"],
+              "query": [
+                {
+                  "key": "daysAhead",
+                  "value": "7",
+                  "description": "Days ahead to check"
+                }
+              ]
+            },
+            "description": "Get subscriptions expiring soon. For admin/monitoring."
+          },
+          "response": []
+        },
+        {
+          "name": "Process Auto Renewals (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/subscription/process-renewals?daysAhead=7",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription", "process-renewals"],
+              "query": [
+                {
+                  "key": "daysAhead",
+                  "value": "7"
+                }
+              ]
+            },
+            "description": "Trigger automatic renewal processing. For cron jobs/admin."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Card",
+      "description": "Card management endpoints - save, charge, and manage payment cards via Paystack.",
+      "item": [
+        {
+          "name": "Initialize Card Save",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"callbackUrl\": \"https://yourapp.com/callback\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/card/save/initialize",
+              "host": ["{{baseUrl}}"],
+              "path": ["card", "save", "initialize"]
+            },
+            "description": "Start the card saving process via Paystack.\n\nReturns an authorization URL to redirect the user for card verification (₦1 charge)."
+          },
+          "response": []
+        },
+        {
+          "name": "Verify & Save Card",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"reference\": \"paystack_reference_here\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/card/save/verify",
+              "host": ["{{baseUrl}}"],
+              "path": ["card", "save", "verify"]
+            },
+            "description": "Verify payment and save card.\n\n**Note:** In production, cards are saved automatically via Paystack webhook. This is for testing/fallback."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Saved Cards",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.success && jsonData.data.cards && jsonData.data.cards.length > 0) {",
+                  "    pm.collectionVariables.set('cardId', jsonData.data.cards[0]._id);",
+                  "    console.log('Card ID saved:', jsonData.data.cards[0]._id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/card/list",
+              "host": ["{{baseUrl}}"],
+              "path": ["card", "list"]
+            },
+            "description": "Get all saved cards for the entity."
+          },
+          "response": []
+        },
+        {
+          "name": "Set Default Card",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"cardId\": \"{{cardId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/card/default",
+              "host": ["{{baseUrl}}"],
+              "path": ["card", "default"]
+            },
+            "description": "Set a card as the default payment method."
+          },
+          "response": []
+        },
+        {
+          "name": "Charge Card",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"amount\": 500000,\n    \"description\": \"Payment for services\",\n    \"cardId\": \"{{cardId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/card/charge",
+              "host": ["{{baseUrl}}"],
+              "path": ["card", "charge"]
+            },
+            "description": "Charge a saved card.\n\n**Amount:** In kobo (e.g., 500000 = ₦5,000)\n\n**cardId:** Optional - uses default card if not specified"
+          },
+          "response": []
+        },
+        {
+          "name": "Check Card Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/card/status?reference=paystack_reference",
+              "host": ["{{baseUrl}}"],
+              "path": ["card", "status"],
+              "query": [
+                {
+                  "key": "reference",
+                  "value": "paystack_reference"
+                }
+              ]
+            },
+            "description": "Check if a card was saved via webhook."
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Card",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/card/{{cardId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["card", "{{cardId}}"]
+            },
+            "description": "Delete a saved card."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Inventory",
+      "description": "Inventory management endpoints - manage products and services catalog.",
+      "item": [
+        {
+          "name": "Create Inventory Item",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.success && jsonData.data._id) {",
+                  "    pm.collectionVariables.set('inventoryId', jsonData.data._id);",
+                  "    console.log('Inventory ID saved:', jsonData.data._id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "Web Development Package",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "Complete website development including design, development, and deployment",
+                  "type": "text"
+                },
+                {
+                  "key": "tags",
+                  "value": "web,development,design",
+                  "type": "text"
+                },
+                {
+                  "key": "amount",
+                  "value": "500000",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "",
+                  "description": "Product image (optional)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/inventory",
+              "host": ["{{baseUrl}}"],
+              "path": ["inventory"]
+            },
+            "description": "Create a new inventory item.\n\n**Required:** name, amount\n\n**Optional:** description, tags (comma-separated), image"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Inventory (JSON)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.success && jsonData.data._id) {",
+                  "    pm.collectionVariables.set('inventoryId', jsonData.data._id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Consulting Service\",\n    \"description\": \"1-hour business consulting session\",\n    \"tags\": [\"consulting\", \"business\", \"strategy\"],\n    \"amount\": 50000\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/inventory",
+              "host": ["{{baseUrl}}"],
+              "path": ["inventory"]
+            },
+            "description": "Create inventory item without image using JSON."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Inventory",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/inventory?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["inventory"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Search by name or description",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get all inventory items with pagination and search."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Single Inventory",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/inventory/{{inventoryId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["inventory", "{{inventoryId}}"]
+            },
+            "description": "Get a specific inventory item by ID."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Inventory",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Web Development Package Pro\",\n    \"amount\": 750000,\n    \"description\": \"Premium website development with advanced features\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/inventory/{{inventoryId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["inventory", "{{inventoryId}}"]
+            },
+            "description": "Update an existing inventory item."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Inventory",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/inventory/{{inventoryId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["inventory", "{{inventoryId}}"]
+            },
+            "description": "Delete an inventory item."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Utils",
+      "description": "Utility endpoints - banks listing and verification.",
+      "item": [
+        {
+          "name": "List All Banks",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/utils/get-banks",
+              "host": ["{{baseUrl}}"],
+              "path": ["utils", "get-banks"]
+            },
+            "description": "Get list of all Nigerian banks from Paystack.\n\nNo authentication required."
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Bank Account",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"accountNumber\": \"0123456789\",\n    \"bankCode\": \"044\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/utils/resolve-bank",
+              "host": ["{{baseUrl}}"],
+              "path": ["utils", "resolve-bank"]
+            },
+            "description": "Verify a bank account number and get the account name.\n\nUse bank codes from the List All Banks endpoint."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Webhook",
+      "description": "Webhook endpoints for Paystack payment notifications.",
+      "item": [
+        {
+          "name": "Paystack Webhook",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-paystack-signature",
+                "value": "{{paystackSignature}}",
+                "description": "Paystack webhook signature"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"event\": \"charge.success\",\n    \"data\": {\n        \"reference\": \"test_reference\",\n        \"amount\": 10000,\n        \"status\": \"success\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/webhook",
+              "host": ["{{baseUrl}}"],
+              "path": ["webhook"]
+            },
+            "description": "Handle Paystack payment webhooks.\n\n**Note:** This endpoint is called by Paystack, not your application.\n\nEvents handled:\n- charge.success\n- Card authorizations\n- Failed transactions"
+          },
+          "response": []
+        },
+        {
+          "name": "Webhook Callback",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/webhook/callback?reference=test_reference&trxref=test_trxref",
+              "host": ["{{baseUrl}}"],
+              "path": ["webhook", "callback"],
+              "query": [
+                {
+                  "key": "reference",
+                  "value": "test_reference"
+                },
+                {
+                  "key": "trxref",
+                  "value": "test_trxref"
+                }
+              ]
+            },
+            "description": "Handle redirect callbacks from Paystack after payment."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
+
+

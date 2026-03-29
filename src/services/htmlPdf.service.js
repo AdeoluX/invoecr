@@ -5,25 +5,90 @@ const fs = require("fs");
 class HTMLPDFService {
   /**
    * Generate PDF from HTML template using Playwright
-   * @param {Object} invoice - Invoice data
-   * @param {Object} entity - Entity data
-   * @param {Object} customer - Customer data
+   * @param {Object} data - Data object containing invoice, entity, customer, and templateId
    * @param {Object} subscriptionPlan - Subscription plan data
-   * @param {string} templateId - Template ID (invoice1, invoice2, invoice3, invoice4)
+   * @param {boolean} isPreview - Flag to bypass premium template checks for preview
    * @returns {Promise<Buffer>} PDF buffer
    */
-  static async generateInvoicePdfFromHtml(
-    invoice,
-    entity,
-    customer,
-    subscriptionPlan,
-    templateId = "invoice2"
-  ) {
+  static async generateHTMLPDF(data, subscriptionPlan = null, isPreview = false) {
     try {
+      const htmlContent = await this.generateHTMLInvoice(data, subscriptionPlan, isPreview);
+
+      // Launch browser
+      const browser = await chromium.launch({
+        headless: true,
+        executablePath:
+          process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined,
+        args: [
+          "--no-sandbox",
+          "--disable-setuid-sandbox",
+          "--disable-dev-shm-usage",
+        ],
+      });
+      const page = await browser.newPage();
+
+      // Set viewport to A4 dimensions
+      await page.setViewportSize({ width: 794, height: 1123 });
+
+      // Set content and generate PDF
+      await page.setContent(htmlContent, { waitUntil: "networkidle" });
+
+      const pdfBuffer = await page.pdf({
+        format: "A4",
+        width: "210mm",
+        height: "297mm",
+        margin: {
+          top: "0mm",
+          right: "0mm",
+          bottom: "0mm",
+          left: "0mm",
+        },
+        printBackground: true,
+      });
+
+      await browser.close();
+      return pdfBuffer;
+    } catch (error) {
+      console.error("HTML PDF Generation Error:", error);
+      throw new Error(`Failed to generate PDF from HTML: ${error.message}`);
+    }
+  }
+
+  /**
+   * Generate HTML content from template
+   * @param {Object} data - Data object containing invoice, entity, customer, and templateId
+   * @param {Object} subscriptionPlan - Subscription plan data
+   * @param {boolean} isPreview - Flag to bypass premium template checks for preview
+   * @returns {Promise<string>} HTML content
+   */
+  static async generateHTMLInvoice(data, subscriptionPlan = null, isPreview = false) {
+    try {
+      const { invoice, entity, customer } = data;
+      const templateId = data.templateId || "invoice1";
+
       // Input validation
       if (!invoice || !entity || !customer) {
         throw new Error(
           "Missing required parameters: invoice, entity, or customer"
+        );
+      }
+
+      // Authorization check for premium templates
+      const premiumTemplateIds = [
+        "invoice5",
+        "invoice6",
+        "invoice7",
+        "invoice8",
+        "invoice9",
+        "invoice10",
+      ];
+      if (
+        !isPreview &&
+        premiumTemplateIds.includes(templateId) &&
+        (!subscriptionPlan || !subscriptionPlan.features?.premiumTemplates)
+      ) {
+        throw new Error(
+          "This template is only available on Basic or Premium plans. Please upgrade to access this design."
         );
       }
 
@@ -52,57 +117,15 @@ class HTMLPDFService {
         templateId
       );
 
-      // Launch browser using system Chromium
-      const browser = await chromium.launch({
-        headless: true,
-        executablePath:
-          process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined,
-        args: [
-          "--no-sandbox",
-          "--disable-setuid-sandbox",
-          "--disable-dev-shm-usage",
-        ],
-      });
-      const page = await browser.newPage();
-
-      // Set viewport to A4 dimensions (210mm x 297mm)
-      await page.setViewportSize({ width: 794, height: 1123 }); // A4 at 96 DPI
-
-      // Set content and generate PDF
-      await page.setContent(htmlContent, { waitUntil: "networkidle" });
-
-      const pdfBuffer = await page.pdf({
-        format: "A4",
-        width: "210mm",
-        height: "297mm",
-        margin: {
-          top: "0mm",
-          right: "0mm",
-          bottom: "0mm",
-          left: "0mm",
-        },
-        printBackground: true,
-        preferCSSPageSize: false,
-        displayHeaderFooter: false,
-      });
-
-      await browser.close();
-      return pdfBuffer;
+      return htmlContent;
     } catch (error) {
-      console.error("HTML PDF Generation Error:", error);
-      throw new Error(`Failed to generate PDF from HTML: ${error.message}`);
+      console.error("HTML Generation Error:", error);
+      throw error;
     }
   }
 
   /**
    * Replace template placeholders with actual data
-   * @param {string} htmlContent - HTML template content
-   * @param {Object} invoice - Invoice data
-   * @param {Object} entity - Entity data
-   * @param {Object} customer - Customer data
-   * @param {Object} subscriptionPlan - Subscription plan data
-   * @param {string} templateId - Template ID
-   * @returns {string} Processed HTML content
    */
   static replaceTemplateData(
     htmlContent,
@@ -112,17 +135,15 @@ class HTMLPDFService {
     subscriptionPlan,
     templateId
   ) {
-    // Calculate totals
     const subtotal =
       invoice.items?.reduce(
-        (sum, item) => sum + (item.quantity || 0) * (item.unitPrice || 0),
+        (sum, item) => sum + (Number(item.quantity) || 0) * (Number(item.unitPrice) || 0),
         0
       ) || 0;
-    const taxRate = invoice.taxRate / 100 || 0.075; // Default 7.5% VAT
+    const taxRate = typeof invoice.taxRate === 'number' ? invoice.taxRate / 100 : 0.075;
     const tax = subtotal * taxRate;
     const total = subtotal + tax;
 
-    // Format currency
     const formatCurrency = (amount) => {
       return new Intl.NumberFormat("en-NG", {
         style: "currency",
@@ -130,7 +151,6 @@ class HTMLPDFService {
       }).format(amount);
     };
 
-    // Format date
     const formatDate = (date) => {
       if (!date) return "N/A";
       return new Date(date).toLocaleDateString("en-NG", {
@@ -138,9 +158,7 @@ class HTMLPDFService {
       });
     };
 
-    // Common replacements
     const replacements = {
-      // Invoice data
       "{{INVOICE_NUMBER}}": invoice.invoiceNumber || "INV-0000",
       "{{INVOICE_CODE}}": invoice.invoiceCode || "INV-0000",
       "{{INVOICE_DATE}}": formatDate(invoice.issueDate),
@@ -148,101 +166,65 @@ class HTMLPDFService {
       "{{PAYMENT_TERMS}}": invoice.paymentTerms || "Net 30",
       "{{NOTES}}": invoice.notes || "Thank you for your business!",
       "{{CURRENCY}}": invoice.currency || "NGN",
-
-      // Entity data
       "{{ENTITY_NAME}}": entity.name || "Business Name",
       "{{ENTITY_ADDRESS}}": entity.address || "Business Address",
       "{{ENTITY_PHONE}}": entity.phone || "N/A",
       "{{ENTITY_EMAIL}}": entity.email || "N/A",
       "{{ENTITY_LOGO}}": entity.logo?.secure_url || "",
       "{{ENTITY_LOGO_DISPLAY}}": entity.logo?.secure_url ? "block" : "none",
+      "{{ENTITY_LOGO_STYLE}}": entity.logo?.secure_url ? "display: block;" : "display: none;",
       "{{ENTITY_SIGNATURE}}": entity.signature?.secure_url || "",
-      "{{ENTITY_SIGNATURE_DISPLAY}}": entity.signature?.secure_url
-        ? "block"
-        : "none",
-      "{{ENTITY_SIGNATURE_DISPLAY_NONE}}": entity.signature?.secure_url
-        ? "none"
-        : "block",
+      "{{ENTITY_SIGNATURE_DISPLAY}}": entity.signature?.secure_url ? "block" : "none",
+      "{{ENTITY_SIGNATURE_DISPLAY_NONE}}": entity.signature?.secure_url ? "none" : "block",
+      "{{ENTITY_SIGNATURE_STYLE}}": entity.signature?.secure_url ? "display: block;" : "display: none;",
+      "{{ENTITY_SIGNATURE_STYLE_NONE}}": entity.signature?.secure_url ? "display: none;" : "display: block;",
       "{{ENTITY_WEBSITE}}": entity.website || entity.email || "N/A",
-
-      // Customer data
       "{{CUSTOMER_NAME}}": customer.name || "Customer Name",
       "{{CUSTOMER_ADDRESS}}": customer.address || "Customer Address",
       "{{CUSTOMER_PHONE}}": customer.phone || "N/A",
       "{{CUSTOMER_EMAIL}}": customer.email || "N/A",
-
-      // Financial data
       "{{SUBTOTAL}}": formatCurrency(subtotal),
       "{{TAX_RATE}}": `${(taxRate * 100).toFixed(1)}%`,
       "{{TAX_AMOUNT}}": formatCurrency(tax),
       "{{TOTAL}}": formatCurrency(total),
-
-      // Payment link
-      "{{PAYMENT_LINK}}": `${
-        process.env.BACKEND_URL || "http://localhost:3000"
-      }/invoice/${invoice.invoiceNumber}/initiate-payment`,
-
-      // Status
+      "{{PAYMENT_LINK}}": `${process.env.BACKEND_URL || "http://localhost:3000"}/invoice/${invoice.invoiceNumber}/initiate-payment`,
       "{{STATUS}}": (invoice.status || "draft").toUpperCase(),
       "{{PAYMENT_STATUS}}": (invoice.paymentStatus || "unpaid").toUpperCase(),
+      "{{DOCUMENT_TITLE}}": invoice.type === "quote" ? "ESTIMATE" : "INVOICE",
+      "{{BILL_TO_LABEL}}": invoice.type === "quote" ? "Estimate to:" : "Invoice to:",
+      "{{DOCUMENT_NUMBER_LABEL}}": invoice.type === "quote" ? "Estimate#" : "Invoice#",
+      "{{PAYMENT_INFO_DISPLAY}}": invoice.type === "quote" ? "none" : "block",
+      "{{PAYMENT_INFO_STYLE}}": invoice.type === "quote" ? "display: none;" : "display: block;",
     };
 
-    // Apply common replacements
     Object.entries(replacements).forEach(([placeholder, value]) => {
       htmlContent = htmlContent.replace(new RegExp(placeholder, "g"), value);
     });
 
-    // Template-specific replacements
-    if (templateId === "invoice1") {
-      htmlContent = this.replaceInvoice1Data(
-        htmlContent,
-        invoice,
-        entity,
-        customer
-      );
-    } else if (templateId === "invoice2") {
-      htmlContent = this.replaceInvoice2Data(
-        htmlContent,
-        invoice,
-        entity,
-        customer
-      );
-    } else if (templateId === "invoice3") {
-      htmlContent = this.replaceInvoice3Data(
-        htmlContent,
-        invoice,
-        entity,
-        customer
-      );
-    } else if (templateId === "invoice4") {
-      htmlContent = this.replaceInvoice4Data(
-        htmlContent,
-        invoice,
-        entity,
-        customer
-      );
+    const templateMethods = {
+      invoice1: this.replaceInvoice1Data,
+      invoice2: this.replaceInvoice2Data,
+      invoice3: this.replaceInvoice3Data,
+      invoice4: this.replaceInvoice4Data,
+      invoice5: this.replaceInvoice5Data,
+      invoice6: this.replaceInvoice6Data,
+      invoice7: this.replaceInvoice7Data,
+      invoice8: this.replaceInvoice8Data,
+      invoice9: this.replaceInvoice9Data,
+      invoice10: this.replaceInvoice10Data,
+    };
+
+    if (templateMethods[templateId]) {
+      htmlContent = templateMethods[templateId](htmlContent, invoice, entity, customer);
     }
 
-    // Replace items table
     htmlContent = this.replaceItemsTable(htmlContent, invoice, templateId);
-
     return htmlContent;
   }
 
-  /**
-   * Replace items table in HTML
-   * @param {string} htmlContent - HTML content
-   * @param {Object} invoice - Invoice data
-   * @param {string} templateId - Template ID
-   * @returns {string} HTML with replaced items table
-   */
   static replaceItemsTable(htmlContent, invoice, templateId) {
     if (!invoice.items || invoice.items.length === 0) {
-      const colspan = templateId === "invoice1" ? "5" : "4";
-      return htmlContent.replace(
-        "{{ITEMS_TABLE}}",
-        `<tr><td colspan="${colspan}">No items found</td></tr>`
-      );
+      return htmlContent.replace("{{ITEMS_TABLE}}", `<tr><td colspan="5">No items found</td></tr>`);
     }
 
     const formatCurrency = (amount) => {
@@ -253,142 +235,60 @@ class HTMLPDFService {
     };
 
     let itemsHtml = "";
-
     if (templateId === "invoice1") {
-      // Table format for invoice1 with new structure
       invoice.items.forEach((item, index) => {
         const itemTotal = (item.quantity || 0) * (item.unitPrice || 0);
-        itemsHtml += `
-          <tr>
-            <td>${String(index + 1).padStart(2, "0")}</td>
-            <td>${item.name || "Item"}</td>
-            <td>${formatCurrency(item.unitPrice || 0)}</td>
-            <td>${item.quantity || 0}</td>
-            <td>${formatCurrency(itemTotal)}</td>
-          </tr>
-        `;
+        itemsHtml += `<tr><td>${String(index + 1).padStart(2, "0")}</td><td>${item.name}</td><td>${formatCurrency(item.unitPrice)}</td><td>${item.quantity}</td><td>${formatCurrency(itemTotal)}</td></tr>`;
       });
     } else if (templateId === "invoice2") {
-      // Flex format for invoice2
-      invoice.items.forEach((item, index) => {
+      invoice.items.forEach((item) => {
         const itemTotal = (item.quantity || 0) * (item.unitPrice || 0);
-        itemsHtml += `
-          <div class="table-row">
-            <div class="item-description">
-              <h4>${item.name || "Item"}</h4>
-              <p>${item.description || ""}</p>
-            </div>
-            <div class="price">${formatCurrency(item.unitPrice || 0)}</div>
-            <div class="qty">${item.quantity || 0}</div>
-            <div class="total">${formatCurrency(itemTotal)}</div>
-          </div>
-        `;
+        itemsHtml += `<div class="table-row"><div class="item-description"><h4>${item.name}</h4><p>${item.description || ""}</p></div><div class="price">${formatCurrency(item.unitPrice)}</div><div class="qty">${item.quantity}</div><div class="total">${formatCurrency(itemTotal)}</div></div>`;
       });
-    } else if (templateId === "invoice3") {
-      // Table format for invoice3
+    } else {
+      // Default table format for 3-10
       invoice.items.forEach((item, index) => {
         const itemTotal = (item.quantity || 0) * (item.unitPrice || 0);
-        itemsHtml += `
-          <tr>
-            <td class="sl">${index + 1}</td>
-            <td class="description">${item.name || "Item"}</td>
-            <td class="price">${formatCurrency(item.unitPrice || 0)}</td>
-            <td class="qty">${item.quantity || 0}</td>
-            <td class="total">${formatCurrency(itemTotal)}</td>
-          </tr>
-        `;
+        itemsHtml += `<tr><td class="sl">${index + 1}</td><td class="description">${item.name}</td><td class="price">${formatCurrency(item.unitPrice)}</td><td class="qty">${item.quantity}</td><td class="total">${formatCurrency(itemTotal)}</td></tr>`;
       });
     }
 
     return htmlContent.replace("{{ITEMS_TABLE}}", itemsHtml);
   }
 
-  /**
-   * Template-specific replacements for invoice1
-   */
-  static replaceInvoice1Data(htmlContent, invoice, entity, customer) {
-    // Add any template-specific replacements for invoice1
-    return htmlContent;
-  }
+  static replaceInvoice1Data(h, i, e, c) { return h; }
+  static replaceInvoice2Data(h, i, e, c) { return h; }
+  static replaceInvoice3Data(h, i, e, c) { return h; }
+  static replaceInvoice4Data(h, i, e, c) { return h; }
+  static replaceInvoice5Data(h, i, e, c) { return h; }
+  static replaceInvoice6Data(h, i, e, c) { return h; }
+  static replaceInvoice7Data(h, i, e, c) { return h; }
+  static replaceInvoice8Data(h, i, e, c) { return h; }
+  static replaceInvoice9Data(h, i, e, c) { return h; }
+  static replaceInvoice10Data(h, i, e, c) { return h; }
 
-  /**
-   * Template-specific replacements for invoice2
-   */
-  static replaceInvoice2Data(htmlContent, invoice, entity, customer) {
-    // Add any template-specific replacements for invoice2
-    return htmlContent;
-  }
-
-  /**
-   * Template-specific replacements for invoice3
-   */
-  static replaceInvoice3Data(htmlContent, invoice, entity, customer) {
-    // Add any template-specific replacements for invoice3
-    return htmlContent;
-  }
-
-  /**
-   * Template-specific replacements for invoice4
-   */
-  static replaceInvoice4Data(htmlContent, invoice, entity, customer) {
-    // Add any template-specific replacements for invoice4
-    return htmlContent;
-  }
-
-  /**
-   * Generate invoice PDF buffer for download using HTML templates
-   * @param {string} invoiceId - Invoice ID
-   * @param {string} entityId - Entity ID
-   * @param {string} templateId - Template ID (invoice1, invoice2, invoice3, invoice4)
-   * @returns {Promise<Buffer>} PDF buffer
-   */
-  static async generateInvoicePDFBuffer(
-    invoiceId,
-    entityId,
-    templateId = "invoice1"
-  ) {
+  static async generateInvoicePDFBuffer(invoiceId, entityId, templateId = "invoice1") {
     try {
-      if (!invoiceId || !entityId) {
-        throw new Error("Missing invoiceId or entityId");
-      }
-
       const Invoice = require("../models/invoice.model");
-      const invoice = await Invoice.findById(invoiceId)
-        .populate("customer")
-        .populate("entity")
-        .populate("items");
-
-      if (!invoice) {
-        throw new Error("Invoice not found");
-      }
-
       const Entity = require("../models/entity.model");
-      const entity = await Entity.findById(entityId).populate(
-        "subscriptionPlan"
-      );
+      
+      const invoice = await Invoice.findById(invoiceId).populate("customer").populate("entity").populate("items");
+      if (!invoice) throw new Error("Invoice not found");
 
-      if (!entity) {
-        throw new Error("Entity not found");
-      }
+      const entity = await Entity.findById(entityId).populate("subscriptionPlan");
+      if (!entity) throw new Error("Entity not found");
 
-      // Generate PDF with HTML template
-      const pdfBuffer = await this.generateInvoicePdfFromHtml(
+      // Use the proper HTML generation method
+      const data = {
         invoice,
         entity,
-        invoice.customer,
-        entity.subscriptionPlan,
+        customer: invoice.customer,
         templateId
-      );
-
-      return pdfBuffer;
+      };
+      
+      return await this.generateHTMLPDF(data, entity.subscriptionPlan, false);
     } catch (error) {
-      console.error("HTML PDF Generation Error:", {
-        invoiceId,
-        entityId,
-        templateId,
-        error: error.message,
-        stack: error.stack,
-      });
+      console.error("PDF Generation Error:", error);
       throw new Error(`Failed to generate PDF: ${error.message}`);
     }
   }

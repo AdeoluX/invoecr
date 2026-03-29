@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{DOCUMENT_TITLE}}</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&display=swap');
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #334155;
+            background: #f8fafc;
+        }
+        
+        .wrapper {
+            max-width: 900px;
+            margin: 40px auto;
+            background: #fff;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+            display: flex;
+            min-height: 1000px;
+        }
+        
+        .sidebar {
+            width: 280px;
+            background: #1e293b;
+            color: #fff;
+            padding: 60px 40px;
+        }
+        
+        .main {
+            flex: 1;
+            padding: 60px 60px;
+        }
+        
+        .logo {
+            max-width: 120px;
+            margin-bottom: 40px;
+            display: block; display: {{ENTITY_LOGO_DISPLAY}};
+        }
+        
+        .sidebar h2 {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #94a3b8;
+            margin-bottom: 15px;
+        }
+        
+        .sidebar p {
+            font-size: 14px;
+            line-height: 1.8;
+            margin-bottom: 40px;
+            color: #cbd5e1;
+        }
+        
+        .doc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 80px;
+            border-bottom: 4px solid #1e293b;
+            padding-bottom: 20px;
+        }
+        
+        .doc-title {
+            font-size: 48px;
+            font-weight: 900;
+            margin: 0;
+            color: #1e293b;
+        }
+        
+        .doc-num {
+            font-size: 18px;
+            color: #64748b;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+        
+        .info-block h3 {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #94a3b8;
+            margin-bottom: 10px;
+        }
+        
+        .info-block p {
+            font-size: 16px;
+            font-weight: 700;
+            margin: 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background: #f1f5f9;
+            padding: 15px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+        
+        td {
+            padding: 20px 15px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 14px;
+        }
+        
+        .total-area {
+            margin-top: 40px;
+            padding: 30px;
+            background: #1e293b;
+            color: #fff;
+            border-radius: 8px;
+        }
+        
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .grand-total {
+            font-size: 28px;
+            font-weight: 900;
+            margin-top: 20px;
+            border-top: 1px solid #334155;
+            padding-top: 20px;
+        }
+        
+        .payment-link {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 12px 24px;
+            background: #3b82f6;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <aside class="sidebar">
+            <img src="{{ENTITY_LOGO}}" class="logo">
+            <h2>From</h2>
+            <p>
+                <strong>{{ENTITY_NAME}}</strong><br>
+                {{ENTITY_ADDRESS}}<br>
+                {{ENTITY_PHONE}}<br>
+                {{ENTITY_EMAIL}}
+            </p>
+            <h2>Follow Us</h2>
+            <p>{{ENTITY_WEBSITE}}</p>
+            
+            <div style="{{PAYMENT_INFO_STYLE}}">
+                <h2>Bank Details</h2>
+                <p>Transfer to our official account for faster processing.</p>
+                <a href="{{PAYMENT_LINK}}" class="payment-link">Secure Payment</a>
+            </div>
+        </aside>
+        
+        <main class="main">
+            <header class="doc-header">
+                <h1 class="doc-title">{{DOCUMENT_TITLE}}</h1>
+                <div class="doc-num">{{DOCUMENT_NUMBER_LABEL}} {{INVOICE_NUMBER}}</div>
+            </header>
+            
+            <div class="info-grid">
+                <div class="info-block">
+                    <h3>{{BILL_TO_LABEL}}</h3>
+                    <p>{{CUSTOMER_NAME}}</p>
+                    <div style="font-size: 14px; color: #64748b; margin-top: 5px;">{{CUSTOMER_ADDRESS}}</div>
+                </div>
+                <div class="info-block">
+                    <h3>Dates</h3>
+                    <div style="margin-bottom: 5px;"><strong>Issued:</strong> {{INVOICE_DATE}}</div>
+                    <div><strong>Due:</strong> {{DUE_DATE}}</div>
+                </div>
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Qty</th>
+                        <th>Price</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{ITEMS_TABLE}}
+                </tbody>
+            </table>
+            
+            <div class="total-area">
+                <div class="total-row">
+                    <span>Subtotal</span>
+                    <span>{{SUBTOTAL}}</span>
+                </div>
+                <div class="total-row">
+                    <span>Tax ({{TAX_RATE}})</span>
+                    <span>{{TAX_AMOUNT}}</span>
+                </div>
+                <div class="total-row grand-total">
+                    <span>Total Amount</span>
+                    <span>{{TOTAL}}</span>
+                </div>
+            </div>
+            
+            <div style="margin-top: 60px;">
+                <h3 style="font-size: 12px; text-transform: uppercase;">Legal Notes</h3>
+                <p style="font-size: 13px; color: #64748b;">{{NOTES}}</p>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

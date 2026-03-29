@@ -18,14 +18,32 @@ const SubscriptionService = require("./subscription.service");
 class InvoiceService {
   // Create a new invoice
   static createInvoice = async (data, entity_id) => {
-    // Check subscription limits
+    // Check feature access for Quotes
+    if (data.type === "quote") {
+      const canAccessQuotes = await SubscriptionService.canAccessFeature(
+        entity_id,
+        "quotesAndEstimates"
+      );
+      abortIf(
+        !canAccessQuotes,
+        httpStatus.FORBIDDEN,
+        "Quotes & Estimates are not available on your current plan. Please upgrade."
+      );
+    }
+
+    // Check subscription limits (applicable to both invoices and quotes for now)
+    console.log(`[InvoiceService] Checking creation limits for entity ${entity_id}, type: ${data.type}`);
     const canCreateInvoice = await SubscriptionService.canCreateInvoice(
-      entity_id
+      entity_id,
+      data.type
     );
+    console.log(`[InvoiceService] canCreateInvoice result: ${canCreateInvoice}`);
     abortIf(
       !canCreateInvoice,
       httpStatus.FORBIDDEN,
-      "Invoice limit reached. Please upgrade your plan to create more invoices."
+      `${
+        data.type === "quote" ? "Quote" : "Invoice"
+      } limit reached. Please upgrade your plan.`
     );
 
     let customer;
@@ -77,7 +95,8 @@ class InvoiceService {
       ...rest,
       customer: customer._id,
       entity: entity_id,
-      status: "draft",
+      status: data.type === "quote" ? "draft" : "published", // Quotes start as draft
+      type: data.type || "invoice",
     });
     abortIf(!invoice, httpStatus.BAD_REQUEST, "Error creating invoice");
 
@@ -218,10 +237,14 @@ class InvoiceService {
         invoiceNumber: 1,
         status: 1,
         subtotal: 1,
+        tax: 1,
+        total: 1,
+        currency: 1,
         issueDate: 1,
         dueDate: 1,
         "customer.name": 1,
         "customer.email": 1,
+        "customer.phone": 1,
         "customer.code": 1,
         items: 1,
         "entity.name": 1,
@@ -319,6 +342,24 @@ class InvoiceService {
     return invoice;
   };
 
+  // Convert a Quote to an Invoice
+  static convertToInvoice = async (invoiceId, entity_id) => {
+    const invoice = await invoiceRepository.findOne({
+      query: { _id: invoiceId, entity: entity_id },
+    });
+    abortIf(!invoice, httpStatus.NOT_FOUND, "Invoice/Quote not found");
+    abortIf(invoice.type !== "quote", httpStatus.BAD_REQUEST, "Already an invoice");
+
+    // Update type and status
+    const updatedInvoice = await invoiceRepository.update(invoiceId, {
+      type: "invoice",
+      status: "published",
+      issueDate: new Date(),
+    });
+
+    return updatedInvoice;
+  };
+
   static generateInvoicePDF = async (invoiceId, res) => {
     // Fetch the invoice data from the database
     const invoice = await InvoiceService.getInvoiceById(invoiceId);
@@ -387,9 +428,9 @@ class InvoiceService {
     doc
       .moveDown()
       .fontSize(12)
-      .text(`Subtotal: $${invoice.subtotal.toFixed(2)}`);
-    doc.text(`Tax: $${invoice.tax.toFixed(2)}`);
-    doc.text(`Total: $${invoice.total.toFixed(2)}`, { underline: true });
+      .text(`Subtotal: ₦${invoice.subtotal.toFixed(2)}`);
+    doc.text(`Tax: ₦${invoice.tax.toFixed(2)}`);
+    doc.text(`Total: ₦${invoice.total.toFixed(2)}`, { underline: true });
 
     // Finalize PDF document
     doc.end();
@@ -403,12 +444,12 @@ class InvoiceService {
         { path: "entity" },
       ],
     });
+    abortIf(!invoice, httpStatus.NOT_FOUND, "Invoice not found");
     abortIf(
       amount > invoice.total,
       httpStatus.BAD_REQUEST,
       "Amount cannot be greater than invoice"
     );
-    abortIf(!invoice, httpStatus.NOT_FOUND, "Invoice not found");
     abortIf(
       invoice.status === "draft" || invoice.paymentStatus === "paid",
       httpStatus.BAD_REQUEST,

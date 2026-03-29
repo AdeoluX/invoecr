@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{DOCUMENT_TITLE}}</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #000;
+            background: #fff;
+        }
+        
+        .page {
+            padding: 80px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 100px;
+        }
+        
+        .brand-h1 {
+            font-weight: 900;
+            font-size: 80px;
+            line-height: 0.8;
+            margin: 0;
+            letter-spacing: -4px;
+        }
+        
+        .meta-info {
+            text-align: right;
+            font-size: 14px;
+            font-weight: 400;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 100px;
+            margin-bottom: 80px;
+        }
+        
+        .label {
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 12px;
+            margin-bottom: 20px;
+            display: block;
+            border-bottom: 4px solid #000;
+            padding-bottom: 5px;
+        }
+        
+        .content {
+            font-size: 18px;
+            font-weight: 300;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 60px;
+        }
+        
+        th {
+            text-align: left;
+            font-weight: 900;
+            font-size: 12px;
+            text-transform: uppercase;
+            padding: 20px 0;
+            border-bottom: 1px solid #000;
+        }
+        
+        td {
+            padding: 30px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 16px;
+        }
+        
+        .price-col { font-weight: 300; }
+        .total-col { font-weight: 700; text-align: right; }
+        .qty-col { text-align: center; }
+        
+        .summary {
+            margin-left: auto;
+            width: 400px;
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            font-size: 18px;
+        }
+        
+        .total-final {
+            font-weight: 900;
+            font-size: 32px;
+            border-top: 10px solid #000;
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+        
+        .footer-minimal {
+            margin-top: 100px;
+            font-size: 14px;
+            font-weight: 400;
+        }
+        
+        .payment-box {
+            background: #000;
+            color: #fff;
+            padding: 40px;
+            margin-top: 40px;
+            display: block; display: {{PAYMENT_INFO_DISPLAY}};
+        }
+        
+        .payment-box a {
+            color: #fff;
+            text-decoration: underline;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <header class="header">
+            <div>
+                <h1 class="brand-h1">{{DOCUMENT_TITLE}}</h1>
+                <p style="font-size: 24px; font-weight: 300; margin-top: 10px;">{{DOCUMENT_NUMBER_LABEL}} {{INVOICE_NUMBER}}</p>
+            </div>
+            <div class="meta-info">
+                <div class="label">From</div>
+                <strong>{{ENTITY_NAME}}</strong><br>
+                {{ENTITY_ADDRESS}}<br>
+                {{ENTITY_EMAIL}}
+            </div>
+        </header>
+
+        <div class="grid">
+            <div>
+                <span class="label">{{BILL_TO_LABEL}}</span>
+                <div class="content">
+                    <strong>{{CUSTOMER_NAME}}</strong><br>
+                    {{CUSTOMER_ADDRESS}}<br>
+                    {{CUSTOMER_PHONE}}
+                </div>
+            </div>
+            <div>
+                <span class="label">Timeline</span>
+                <div class="content">
+                    Issued: {{INVOICE_DATE}}<br>
+                    Due: {{DUE_DATE}}
+                </div>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 50px;">#</th>
+                    <th>Description</th>
+                    <th style="width: 150px;">Unit Price</th>
+                    <th style="width: 80px;" class="qty-col">Qty</th>
+                    <th style="width: 150px;" class="total-col">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{ITEMS_TABLE}}
+            </tbody>
+        </table>
+
+        <div class="summary">
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <span>{{SUBTOTAL}}</span>
+            </div>
+            <div class="summary-row">
+                <span>Tax ({{TAX_RATE}})</span>
+                <span>{{TAX_AMOUNT}}</span>
+            </div>
+            <div class="summary-row total-final">
+                <span>Total</span>
+                <span>{{TOTAL}}</span>
+            </div>
+        </div>
+
+        <div class="payment-box">
+            <div class="label" style="border-color: #fff; color: #fff;">Settle Balance</div>
+            <p>Direct Bank Transfer or Online Payment available.</p>
+            <p><a href="{{PAYMENT_LINK}}">Pay Securely Online</a></p>
+        </div>
+
+        <div class="footer-minimal">
+            <p><strong>Notes:</strong> {{NOTES}}</p>
+            <p style="opacity: 0.5;">{{ENTITY_NAME}} &copy; {{INVOICE_DATE}}</p>
+        </div>
+    </div>
+</body>
+</html>

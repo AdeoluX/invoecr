@@ -629,12 +629,16 @@ class PDFService {
       }
 
       // Use the new HTML PDF service
-      const pdfBuffer = await HTMLPDFService.generateInvoicePdfFromHtml(
+      const data = {
         invoice,
         entity,
-        invoice.customer,
-        entity.subscriptionPlan,
+        customer: invoice.customer,
         templateId
+      };
+      const pdfBuffer = await HTMLPDFService.generateHTMLPDF(
+        data,
+        entity.subscriptionPlan,
+        false
       );
       return pdfBuffer;
     } catch (error) {
@@ -665,13 +669,13 @@ class PDFService {
     subscriptionPlan,
     templateId = "invoice3"
   ) {
-    return await HTMLPDFService.generateInvoicePdfFromHtml(
+    const data = {
       invoice,
       entity,
       customer,
-      subscriptionPlan,
-      templateId
-    );
+      templateId,
+    };
+    return await HTMLPDFService.generateHTMLPDF(data, subscriptionPlan, false);
   }
 }
 

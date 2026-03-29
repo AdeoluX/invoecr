@@ -3,378 +3,459 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Invoice - Brand Name</title>
+    <title>Invoice - Contemporary v2</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-      @page {
-        size: A4;
-        margin: 0;
+      :root {
+        --coral: #fb7185;
+        --coral-light: #fff1f2;
+        --slate-900: #0f172a;
+        --slate-800: #1e293b;
+        --slate-600: #475569;
+        --slate-400: #94a3b8;
+        --slate-200: #e2e8f0;
+        --bg-main: #ffffff;
+        --bg-soft: #f8fafc;
+      }
+
+      * {
+        box-sizing: border-box;
       }
 
       body {
-        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
         margin: 0;
         padding: 0;
-        width: 210mm;
-        min-height: 297mm;
-        background-color: #f8f8f8;
-        box-sizing: border-box;
+        background-color: #f1f5f9;
+        color: var(--slate-800);
+        font-feature-settings: "cv02", "cv03", "cv04", "cv11";
       }
 
       .invoice-container {
-        width: 100%;
-        height: 100vh;
+        width: 210mm;
         min-height: 297mm;
-        margin: 0;
-        background-color: #fff;
-        box-shadow: none;
-        border-radius: 0;
-        overflow: hidden;
-        position: relative;
-        box-sizing: border-box;
-        page-break-inside: avoid;
+        margin: 0 auto;
+        background-color: var(--bg-main);
         display: flex;
         flex-direction: column;
+        position: relative;
+        box-shadow: 0 0 20px rgba(0,0,0,0.05);
       }
-      .header-top-bar {
-        height: 10px;
-        background-color: #f0f0f0;
-      }
-      .invoice-header {
+
+      /* Dynamic Split Header */
+      header {
         display: flex;
-        justify-content: space-between;
-        padding: 30px 40px;
-        padding-bottom: 0;
+        height: 180px;
+        background-color: var(--slate-900);
+        position: relative;
+        overflow: hidden;
       }
-      .company-info {
+
+      header::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 40%;
+        height: 100%;
+        background-color: var(--coral);
+        clip-path: polygon(25% 0, 100% 0, 100% 100%, 0% 100%);
+      }
+
+      .header-left {
+        flex: 1;
+        padding: 40px 50px;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .brand-wrap {
         display: flex;
         align-items: center;
+        gap: 15px;
       }
-      .company-logo {
-        width: 30px;
-        height: 30px;
-        margin-right: 10px;
-        background-color: #333;
-        border-radius: 3px;
+
+      .logo-square {
+        width: 45px;
+        height: 45px;
+        background-color: #fff;
+        border-radius: 10px;
         display: flex;
         justify-content: center;
         align-items: center;
-        color: white;
-        font-size: 18px;
-        font-weight: bold;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
       }
-      .company-logo::before {
-        content: "▲";
-        transform: rotate(45deg);
+
+      .logo-square img {
+        max-width: 80%;
+        max-height: 80%;
       }
-      .company-details {
+
+      .brand-info h2 {
+        color: #fff;
+        margin: 0;
+        font-size: 24px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+
+      .brand-info p {
+        color: var(--slate-400);
+        margin: 2px 0 0 0;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+      }
+
+      .header-right {
+        width: 40%;
+        padding: 40px 50px;
+        z-index: 2;
         display: flex;
         flex-direction: column;
-      }
-      .brand-name {
-        font-size: 18px;
-        font-weight: bold;
-        color: #333;
-        margin-bottom: 3px;
-      }
-      .tagline {
-        font-size: 10px;
-        color: #999;
-        text-transform: uppercase;
-      }
-      .invoice-title-block {
-        background-color: #ef532e;
+        justify-content: center;
+        align-items: flex-end;
         color: #fff;
-        padding: 25px 40px;
-        text-align: right;
-        font-size: 38px;
-        font-weight: bold;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        position: absolute;
-        right: 0;
-        top: 0;
-        width: 35%;
-        height: 100px;
-        box-sizing: border-box;
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        z-index: 1;
       }
-      .invoice-title-block h2 {
+
+      .doc-type {
+        font-size: 44px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
         margin: 0;
-        padding: 0;
         line-height: 1;
       }
-      .invoice-address-details {
-        padding: 20px 40px;
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-top: 20px;
-        position: relative;
-        z-index: 2;
+
+      .doc-id {
+        font-size: 16px;
+        font-weight: 600;
+        margin-top: 5px;
+        color: var(--slate-900);
+        background-color: rgba(255,255,255,0.9);
+        padding: 4px 12px;
+        border-radius: 4px;
       }
-      .bill-to,
-      .invoice-meta {
+
+      /* Metadata Bar */
+      .meta-strip {
+        background-color: var(--bg-soft);
+        border-bottom: 1px solid var(--slate-200);
+        padding: 20px 50px;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+      }
+
+      .meta-cell label {
+        display: block;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--slate-400);
+        margin-bottom: 4px;
+        letter-spacing: 0.05em;
+      }
+
+      .meta-cell span {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--slate-800);
+      }
+
+      /* Info Section */
+      .address-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        padding: 40px 50px;
+        gap: 60px;
+      }
+
+      .address-section h4 {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--slate-400);
+        margin: 0 0 12px 0;
+        letter-spacing: 0.1em;
+      }
+
+      .card-info {
+        background-color: #fff;
+        border: 1px solid var(--slate-200);
+        border-radius: 12px;
+        padding: 20px;
+        position: relative;
+      }
+
+      .card-info::after {
+        content: "";
+        position: absolute;
+        top: -1px;
+        left: 20px;
+        width: 30px;
+        height: 3px;
+        background-color: var(--coral);
+      }
+
+      .p-name {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--slate-900);
+        margin: 0 0 8px 0;
+      }
+
+      .p-detail {
         font-size: 13px;
+        color: var(--slate-600);
+        margin: 3px 0;
         line-height: 1.5;
       }
-      .bill-to h4,
-      .invoice-meta h4 {
-        font-size: 14px;
-        font-weight: normal;
-        color: #666;
-        margin: 0 0 5px;
+
+      /* Items Table */
+      .table-container {
+        flex: 1;
+        padding: 0 50px;
       }
-      .bill-to p {
-        margin: 0;
-        color: #333;
-      }
-      .bill-to .client-name {
-        font-weight: bold;
-        font-size: 15px;
-        color: #000;
-      }
-      .invoice-meta {
-        text-align: right;
-        width: 30%;
-      }
-      .invoice-meta p {
-        margin: 0;
-        color: #333;
-      }
-      .invoice-meta p span {
-        font-weight: bold;
-        color: #000;
-      }
-      .invoice-meta .meta-label {
-        display: inline-block;
-        width: 70px;
-        text-align: left;
-      }
-      .item-table {
+
+      .items-table {
         width: 100%;
-        border-collapse: collapse;
-        margin-top: 30px;
-        background-color: #fdfdfd;
-        flex-grow: 1;
+        border-collapse: separate;
+        border-spacing: 0;
       }
-      .item-table thead th {
-        background-color: #f0f0f0;
-        color: #666;
-        font-size: 12px;
-        font-weight: bold;
+
+      .items-table th {
         text-align: left;
-        padding: 15px 40px;
-        border-bottom: 1px solid #eee;
+        padding: 15px 20px;
+        font-size: 11px;
+        font-weight: 700;
         text-transform: uppercase;
+        color: var(--slate-400);
+        border-bottom: 2px solid var(--slate-900);
       }
-      .item-table tbody td {
-        padding: 15px 40px;
-        border-bottom: 1px solid #eee;
-        font-size: 13px;
-        color: #333;
+
+      .items-table td {
+        padding: 20px;
+        font-size: 14px;
+        border-bottom: 1px solid var(--slate-200);
       }
-      .item-table tbody tr:last-child td {
+
+      .items-table tr:last-child td {
         border-bottom: none;
       }
-      .item-table .sl {
-        width: 5%;
+
+      .text-right { text-align: right !important; }
+
+      .col-total {
+        font-weight: 700;
+        color: var(--slate-900);
       }
-      .item-table .description {
-        width: 50%;
-      }
-      .item-table .price {
-        width: 15%;
-        text-align: left;
-      }
-      .item-table .qty {
-        width: 10%;
-        text-align: left;
-      }
-      .item-table .total {
-        width: 20%;
-        text-align: left;
-      }
-      .summary-section {
+
+      /* Footer Area */
+      .footer-wrap {
+        padding: 40px 50px;
         display: flex;
         justify-content: space-between;
-        padding: 30px 40px;
-        border-top: 1px solid #eee;
+        background-color: var(--bg-soft);
+        border-top: 1px solid var(--slate-200);
       }
-      .left-summary {
+
+      .notes-block {
         width: 50%;
       }
-      .left-summary h4 {
-        font-size: 14px;
-        color: #333;
-        margin: 0 0 10px;
+
+      .notes-block h5 {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--slate-800);
+        margin: 0 0 10px 0;
       }
-      .payment-info p,
-      .terms-conditions p {
+
+      .notes-block p {
+        font-size: 12px;
+        color: var(--slate-600);
+        line-height: 1.6;
         margin: 5px 0;
+      }
+
+      .link-btn {
+        display: inline-block;
+        margin-top: 15px;
+        background-color: var(--slate-900);
+        color: #fff;
+        text-decoration: none;
+        padding: 10px 20px;
+        border-radius: 6px;
         font-size: 12px;
-        color: #666;
+        font-weight: 600;
+        transition: all 0.2s;
       }
-      .payment-info strong {
-        color: #333;
+
+      .totals-block {
+        width: 35%;
       }
-      .terms-conditions {
-        margin-top: 20px;
-      }
-      .terms-conditions h4 {
-        margin-bottom: 5px;
-      }
-      .right-summary {
-        width: 40%;
-        text-align: right;
-      }
-      .summary-row {
+
+      .total-row {
         display: flex;
         justify-content: space-between;
-        margin-bottom: 8px;
+        padding: 8px 0;
         font-size: 14px;
-        color: #333;
+        color: var(--slate-600);
       }
-      .summary-row span:first-child {
-        color: #666;
-      }
-      .summary-row.total-amount {
-        font-size: 18px;
-        font-weight: bold;
-        padding-top: 10px;
-        border-top: 1px solid #eee;
+
+      .total-row.grand {
         margin-top: 15px;
+        padding: 20px 0;
+        border-top: 2px solid var(--slate-900);
+        color: var(--slate-900);
+        font-size: 24px;
+        font-weight: 800;
       }
-      .summary-row.total-amount span {
-        color: #ef532e;
+
+      .total-row.grand .val {
+        color: var(--coral);
       }
-      .signature-section {
-        margin-top: 50px;
+
+      .signature-wrap {
+        margin-top: 30px;
         text-align: right;
-        padding: 0 40px 30px 40px;
-        font-size: 12px;
-        color: #666;
       }
-      .signature-line {
-        border-top: 1px solid #ccc;
-        width: 180px;
-        margin-left: auto;
-        padding-top: 5px;
-        margin-bottom: 5px;
+
+      .sig-img {
+        max-width: 120px;
+        max-height: 40px;
+        margin-bottom: 8px;
+        filter: contrast(1.2);
       }
-      .authorised-sign {
-        margin: 0;
-        font-weight: bold;
+
+      .sig-line {
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--slate-400);
+        letter-spacing: 0.1em;
       }
-      .footer-bar {
-        height: 10px;
-        background-color: #ef532e;
-        width: 100%;
-        margin-top: 20px;
+
+      .bottom-bar {
+        height: 12px;
+        background: linear-gradient(90deg, var(--slate-900) 0%, var(--coral) 100%);
       }
     </style>
   </head>
   <body>
     <div class="invoice-container">
-      <div class="header-top-bar"></div>
-      <div class="invoice-title-block">
-        <h2>INVOICE</h2>
-      </div>
-      <div class="invoice-header">
-        <div class="company-info">
-          <div class="company-logo">
-            <img
-              src="{{ENTITY_LOGO}}"
-              alt="{{ENTITY_NAME}} Logo"
-              style="max-width: 80px; max-height: 80px; display: {{ENTITY_LOGO_DISPLAY}};"
-            />
+      <header>
+        <div class="header-left">
+          <div class="brand-wrap">
+            <div class="logo-square">
+              <img src="{{ENTITY_LOGO}}" alt="Logo" style="{{ENTITY_LOGO_STYLE}}">
+            </div>
+            <div class="brand-info">
+              <h2>{{ENTITY_NAME}}</h2>
+              <p>{{ENTITY_WEBSITE}}</p>
+            </div>
           </div>
-          <div class="company-details">
-            <div class="brand-name">{{ENTITY_NAME}}</div>
-            <div class="tagline">{{ENTITY_EMAIL}}</div>
+        </div>
+        <div class="header-right">
+          <h1 class="doc-type">{{DOCUMENT_TITLE}}</h1>
+          <div class="doc-id">#{{INVOICE_NUMBER}}</div>
+        </div>
+      </header>
+
+      <div class="meta-strip">
+        <div class="meta-cell">
+          <label>Issue Date</label>
+          <span>{{INVOICE_DATE}}</span>
+        </div>
+        <div class="meta-cell">
+          <label>Due Date</label>
+          <span>{{DUE_DATE}}</span>
+        </div>
+        <div class="meta-cell">
+          <label>Currency</label>
+          <span>{{CURRENCY}}</span>
+        </div>
+        <div class="meta-cell">
+          <label>Payment Status</label>
+          <span style="color: var(--coral)">{{PAYMENT_STATUS}}</span>
+        </div>
+      </div>
+
+      <div class="address-grid">
+        <div class="address-section">
+          <h4>{{BILL_TO_LABEL}}</h4>
+          <div class="card-info">
+            <p class="p-name">{{CUSTOMER_NAME}}</p>
+            <p class="p-detail">{{CUSTOMER_ADDRESS}}</p>
+            <p class="p-detail">T: {{CUSTOMER_PHONE}}</p>
+            <p class="p-detail">E: {{CUSTOMER_EMAIL}}</p>
+          </div>
+        </div>
+        <div class="address-section" style="text-align: right;">
+          <h4>Issued By</h4>
+          <div class="card-info" style="border-left: none; border-right: 4px solid var(--slate-900);">
+            <p class="p-name">{{ENTITY_NAME}}</p>
+            <p class="p-detail">{{ENTITY_ADDRESS}}</p>
+            <p class="p-detail">T: {{ENTITY_PHONE}}</p>
+            <p class="p-detail">E: {{ENTITY_EMAIL}}</p>
           </div>
         </div>
       </div>
-      <div class="invoice-address-details">
-        <div class="bill-to">
-          <h4>Invoice to:</h4>
-          <p class="client-name">{{CUSTOMER_NAME}}</p>
-          <p>{{CUSTOMER_ADDRESS}}</p>
-          <p>Phone: {{CUSTOMER_PHONE}}</p>
-          <p>Email: {{CUSTOMER_EMAIL}}</p>
-        </div>
-        <div class="invoice-meta">
-          <p><span class="meta-label">Invoice#</span> {{INVOICE_NUMBER}}</p>
-          <p><span class="meta-label">Date:</span> {{INVOICE_DATE}}</p>
-          <p><span class="meta-label">Due:</span> {{DUE_DATE}}</p>
-        </div>
+
+      <div class="table-container">
+        <table class="items-table">
+          <thead>
+            <tr>
+              <th style="width: 55%">Description</th>
+              <th class="text-right" style="width: 15%">Price</th>
+              <th class="text-right" style="width: 10%">Qty</th>
+              <th class="text-right" style="width: 20%">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{ITEMS_TABLE}}
+          </tbody>
+        </table>
       </div>
-      <table class="item-table">
-        <thead>
-          <tr>
-            <th class="sl">SL.</th>
-            <th class="description">Item Description</th>
-            <th class="price">Price</th>
-            <th class="qty">Qty.</th>
-            <th class="total">Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          {{ITEMS_TABLE}}
-        </tbody>
-      </table>
-      <div class="summary-section">
-        <div class="left-summary">
-          <h4>Thank you for your business</h4>
-          <div class="payment-info">
-            <h4>Payment Info:</h4>
-            <p>Email: <strong>{{ENTITY_EMAIL}}</strong></p>
-            <p>Phone: <strong>{{ENTITY_PHONE}}</strong></p>
-            <p>
-              Payment Link:
-              <a
-                href="{{PAYMENT_LINK}}"
-                target="_blank"
-                style="color: #ef532e; text-decoration: none; font-weight: bold"
-                >Click here to pay</a
-              >
-            </p>
+
+      <div class="footer-wrap">
+        <div class="notes-block">
+          <div style="{{PAYMENT_INFO_STYLE}}">
+            <h5>Secure Payment</h5>
+            <p>Click the button below to settle your balance through our secure payment gateway.</p>
+            <a href="{{PAYMENT_LINK}}" class="link-btn">Pay Online Now &rarr;</a>
           </div>
-          <div class="terms-conditions">
-            <h4>Terms & Conditions</h4>
+          <div style="margin-top: 25px;">
+            <h5>Terms & Conditions</h5>
+            <p>{{PAYMENT_TERMS}}</p>
             <p>{{NOTES}}</p>
           </div>
         </div>
-        <div class="right-summary">
-          <div class="summary-row">
-            <span>Sub Total:</span>
-            <span>{{SUBTOTAL}}</span>
+        <div class="totals-block">
+          <div class="total-row">
+            <span>Subtotal</span>
+            <span class="val">{{SUBTOTAL}}</span>
           </div>
-          <div class="summary-row">
-            <span>Tax ({{TAX_RATE}}):</span>
-            <span>{{TAX_AMOUNT}}</span>
+          <div class="total-row">
+            <span>Tax ({{TAX_RATE}})</span>
+            <span class="val">{{TAX_AMOUNT}}</span>
           </div>
-          <div class="summary-row total-amount">
-            <span>Total:</span>
-            <span>{{TOTAL}}</span>
+          <div class="total-row grand">
+            <span>Total</span>
+            <span class="val">{{TOTAL}}</span>
+          </div>
+
+          <div class="signature-wrap">
+            <img src="{{ENTITY_SIGNATURE}}" alt="Signature" class="sig-img" style="{{ENTITY_SIGNATURE_STYLE}}">
+            <div class="sig-line">Authorized Signatory</div>
           </div>
         </div>
       </div>
-      <div class="signature-section">
-        <img
-          src="{{ENTITY_SIGNATURE}}"
-          alt="Signature"
-          style="max-width: 150px; max-height: 60px; display: {{ENTITY_SIGNATURE_DISPLAY}};"
-        />
-        <div
-          class="signature-line"
-          style="display: {{ENTITY_SIGNATURE_DISPLAY_NONE}};"
-        ></div>
-        <p class="authorised-sign">Authorised Sign</p>
-      </div>
-      <div class="footer-bar"></div>
+
+      <div class="bottom-bar"></div>
     </div>
   </body>
 </html>

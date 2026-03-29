@@ -11,7 +11,7 @@ const RENEWAL_CHECK_DAYS = 7;
 
 // Simple in-memory cache for plans (in production, use Redis or similar)
 const planCache = new Map();
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+const CACHE_TTL = 10 * 1000; // 10 seconds (reduced for development responsiveness)
 
 class SubscriptionService {
   /**
@@ -220,9 +220,13 @@ class SubscriptionService {
 
     abortIf(!entity, httpStatus.NOT_FOUND, "Entity not found");
 
-    // If no subscription plan is set, get the free plan (cached)
+    // If no subscription plan is set or the populated plan is missing, get the free plan
     let plan;
-    if (!entity.subscriptionPlan) {
+    // Check if the plan was successfully populated and has properties
+    const isPlanPopulated = entity.subscriptionPlan && entity.subscriptionPlan.name;
+
+    if (!isPlanPopulated) {
+      console.log(`[SubscriptionService] Plan not populated for entity ${entityIdStr}, falling back to FREE`);
       plan = await this.getPlanByName(FREE_PLAN_NAME);
     } else {
       plan = entity.subscriptionPlan;
@@ -245,17 +249,17 @@ class SubscriptionService {
   }
 
   /**
-   * Check if entity can create invoice
+   * Check if entity can create another invoice
    * @param {string} entityId - Entity ID
+   * @param {string} type - 'invoice' or 'quote'
    * @returns {Promise<boolean>} Can create invoice
    */
-  static async canCreateInvoice(entityId) {
-    const subscription = await this.getEntitySubscription(entityId);
+  static async canCreateInvoice(entityId, type = "invoice") {
+    // GROWTH HACK: Quotes are unlimited (for now)
+    if (type === "quote") return true;
 
-    // Free plan has unlimited invoices
-    if (subscription.plan.maxInvoices === -1) {
-      return true;
-    }
+    const subscription = await this.getEntitySubscription(entityId);
+    if (subscription.plan.maxInvoices === -1) return true;
 
     return subscription.usage.invoicesCreated < subscription.plan.maxInvoices;
   }

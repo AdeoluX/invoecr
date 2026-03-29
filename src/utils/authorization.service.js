@@ -14,7 +14,6 @@ class Authorization {
     // Generate a JWT for a user
     static generateToken(payload) {
         try {
-            console.log(secret);
             // Sign the token with the payload, secret, and expiration
             const token = jwt.sign(payload, secret, { expiresIn: expiresIn });
             return {
@@ -60,8 +59,8 @@ class Authorization {
 
     // Middleware to protect routes (for use in Express.js)
     static authenticateToken(req, res, next) {
-        // Get the token from the Authorization header
-        const authHeader = req.headers['authorization'];
+        // Get the token from the Authorization header or query params
+        const authHeader = req.headers['authorization'] || (req.query.token ? `Bearer ${req.query.token}` : null);
         if (!authHeader) {
             return res.status(401).json({ error: 'No token provided' });
         }

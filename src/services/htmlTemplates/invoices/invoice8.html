@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{DOCUMENT_TITLE}}</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&display=swap');
+        
+        body {
+            font-family: 'Outfit', sans-serif;
+            margin: 0;
+            padding: 40px;
+            color: #1e293b;
+            background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+            min-height: 100vh;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 60px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 60px;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(to right, #7c3aed, #db2777);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 900;
+            font-size: 40px;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 6px 16px;
+            background: linear-gradient(to right, #7c3aed, #db2777);
+            color: #fff;
+            border-radius: 9999px;
+            font-size: 14px;
+            font-weight: 700;
+            margin-top: 10px;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+        
+        .block {
+            padding: 20px;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+        
+        .label {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #64748b;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+            margin-bottom: 40px;
+        }
+        
+        th {
+            text-align: left;
+            padding: 15px;
+            font-size: 13px;
+            color: #94a3b8;
+        }
+        
+        td {
+            padding: 20px 15px;
+            background: #fff;
+            font-size: 16px;
+        }
+        
+        td:first-child { border-radius: 12px 0 0 12px; }
+        td:last-child { border-radius: 0 12px 12px 0; }
+        
+        .total-box {
+            background: #1e293b;
+            color: #fff;
+            padding: 40px;
+            border-radius: 24px;
+            margin-left: auto;
+            width: 350px;
+        }
+        
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .grand-total {
+            font-size: 28px;
+            font-weight: 900;
+            border-top: 1px solid #334155;
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+        
+        .pay-btn {
+            display: block;
+            text-align: center;
+            background: #fff;
+            color: #1e293b;
+            padding: 16px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            margin-top: 30px;
+        }
+        
+        .logo {
+            max-height: 60px;
+            display: block; display: {{ENTITY_LOGO_DISPLAY}};
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <header>
+            <img src="{{ENTITY_LOGO}}" class="logo">
+            <div style="text-align: right;">
+                <h1 class="gradient-text">{{DOCUMENT_TITLE}}</h1>
+                <div class="badge">{{INVOICE_NUMBER}}</div>
+            </div>
+        </header>
+        
+        <div class="grid">
+            <div class="block">
+                <span class="label">From</span>
+                <strong>{{ENTITY_NAME}}</strong><br>
+                {{ENTITY_ADDRESS}}<br>
+                {{ENTITY_EMAIL}}
+            </div>
+            <div class="block">
+                <span class="label">{{BILL_TO_LABEL}}</span>
+                <strong>{{CUSTOMER_NAME}}</strong><br>
+                {{CUSTOMER_ADDRESS}}<br>
+                {{CUSTOMER_PHONE}}
+            </div>
+        </div>
+        
+        <div class="block" style="margin-bottom: 40px;">
+            <div style="display: flex; justify-content: space-around;">
+                <div>
+                    <span class="label">Issued On</span>
+                    <strong>{{INVOICE_DATE}}</strong>
+                </div>
+                <div>
+                    <span class="label">Due On</span>
+                    <strong style="color: #7c3aed;">{{DUE_DATE}}</strong>
+                </div>
+                <div>
+                    <span class="label">Status</span>
+                    <strong>{{STATUS}}</strong>
+                </div>
+            </div>
+        </div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Description</th>
+                    <th>Price</th>
+                    <th>Qty</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{ITEMS_TABLE}}
+            </tbody>
+        </table>
+        
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div style="max-width: 300px;">
+                <span class="label">Notes</span>
+                <p style="font-size: 14px; color: #64748b;">{{NOTES}}</p>
+            </div>
+            <div class="total-box">
+                <div class="total-row"><span>Subtotal</span><span>{{SUBTOTAL}}</span></div>
+                <div class="total-row"><span>Tax ({{TAX_RATE}})</span><span>{{TAX_AMOUNT}}</span></div>
+                <div class="total-row grand-total"><span>Total</span><span>{{TOTAL}}</span></div>
+                <a href="{{PAYMENT_LINK}}" class="pay-btn" style="{{PAYMENT_INFO_STYLE}}">Pay Online Now</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

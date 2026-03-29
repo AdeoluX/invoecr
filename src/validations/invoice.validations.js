@@ -45,6 +45,7 @@ const createInvoiceSchema = {
           "invoice3"
         )
         .default("pdf0"),
+      type: Joi.string().valid("invoice", "quote").default("invoice"),
     })
     .xor("customer_id", "customer"),
   files: Joi.object()
@@ -107,6 +108,7 @@ const updateInvoiceSchema = {
           "invoice3"
         )
         .optional(),
+      type: Joi.string().valid("invoice", "quote").optional(),
     }),
   files: Joi.object()
     .optional()

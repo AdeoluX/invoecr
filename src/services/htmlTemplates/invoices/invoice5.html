@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{DOCUMENT_TITLE}}</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400&display=swap');
+        
+        body {
+            font-family: 'Lato', sans-serif;
+            margin: 0;
+            padding: 40px;
+            color: #1a1a1a;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            border: 1px solid #d4af37;
+            padding: 60px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            border-bottom: 2px double #d4af37;
+            padding-bottom: 30px;
+        }
+        
+        .document-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 48px;
+            letter-spacing: 8px;
+            color: #d4af37;
+            margin: 0;
+            text-transform: uppercase;
+        }
+        
+        .entity-info {
+            margin-top: 20px;
+        }
+        
+        .entity-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+        
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #d4af37;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 40px;
+        }
+        
+        th {
+            font-family: 'Playfair Display', serif;
+            text-align: left;
+            padding: 15px;
+            background: #fafafa;
+            border-bottom: 1px solid #d4af37;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+        
+        .totals {
+            margin-left: auto;
+            width: 300px;
+        }
+        
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+        }
+        
+        .grand-total {
+            border-top: 2px solid #d4af37;
+            font-weight: 700;
+            font-size: 20px;
+            color: #d4af37;
+            margin-top: 10px;
+            padding-top: 15px;
+        }
+        
+        .footer {
+            margin-top: 80px;
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+        
+        .logo {
+            max-height: 80px;
+            margin-bottom: 20px;
+            display: block; display: {{ENTITY_LOGO_DISPLAY}};
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="{{ENTITY_LOGO}}" alt="Logo" class="logo">
+            <h1 class="document-title">{{DOCUMENT_TITLE}}</h1>
+            <div class="entity-info">
+                <div class="entity-name">{{ENTITY_NAME}}</div>
+                <div>{{ENTITY_ADDRESS}}</div>
+                <div>{{ENTITY_PHONE}} | {{ENTITY_EMAIL}}</div>
+            </div>
+        </header>
+        
+        <div class="details-grid">
+            <div class="bill-to">
+                <div class="section-title">{{BILL_TO_LABEL}}</div>
+                <div style="font-size: 18px; font-weight: 700;">{{CUSTOMER_NAME}}</div>
+                <div>{{CUSTOMER_ADDRESS}}</div>
+                <div>{{CUSTOMER_PHONE}}</div>
+            </div>
+            <div class="invoice-meta">
+                <div class="section-title">Details</div>
+                <div><strong>{{DOCUMENT_NUMBER_LABEL}}</strong> {{INVOICE_NUMBER}}</div>
+                <div><strong>Date:</strong> {{INVOICE_DATE}}</div>
+                <div><strong>Due Date:</strong> {{DUE_DATE}}</div>
+            </div>
+        </div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Description</th>
+                    <th>Price</th>
+                    <th>Qty</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{ITEMS_TABLE}}
+            </tbody>
+        </table>
+        
+        <div class="totals">
+            <div class="total-row">
+                <span>Subtotal</span>
+                <span>{{SUBTOTAL}}</span>
+            </div>
+            <div class="total-row">
+                <span>Tax ({{TAX_RATE}})</span>
+                <span>{{TAX_AMOUNT}}</span>
+            </div>
+            <div class="total-row grand-total">
+                <span>Total</span>
+                <span>{{TOTAL}}</span>
+            </div>
+        </div>
+        
+        <div class="payment-info" style="{{PAYMENT_INFO_STYLE}}">
+            <div class="section-title">Payment Instructions</div>
+            <p>Please use <strong>{{INVOICE_NUMBER}}</strong> as payment reference.</p>
+            <p><a href="{{PAYMENT_LINK}}" style="color: #d4af37; text-decoration: none; font-weight: 700;">PAY ONLINE &rarr;</a></p>
+        </div>
+        
+        <div class="footer">
+            <p>{{NOTES}}</p>
+            <p>&copy; {{ENTITY_NAME}} | Thank you for your partnership.</p>
+        </div>
+    </div>
+</body>
+</html>

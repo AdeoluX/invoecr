@@ -80,9 +80,9 @@ class AuthService {
   };
   static signIn = async (email, password) => {
     const entity = await entityRepository.findOne({ query: { email } });
-    abortIf(!entity, httpStatus.NOT_FOUND, "Entity not found");
+    abortIf(!entity, httpStatus.UNAUTHORIZED, "Invalid email or password");
     const isMatch = await bcrypt.compare(password, entity.password);
-    abortIf(!isMatch, httpStatus.BAD_REQUEST, "Invalid credentials");
+    abortIf(!isMatch, httpStatus.UNAUTHORIZED, "Invalid email or password");
     new EmailBuilder().send(entity.email, "login", {
       userName: entity.first_name || entity.last_name || entity.name,
       loginTime: new Date().toLocaleString(),
@@ -90,7 +90,7 @@ class AuthService {
       location: "Unknown",
       supportEmail: process.env.SUPPORT_EMAIL,
       supportPhone: process.env.SUPPORT_PHONE,
-    });
+    }).catch((err) => console.error("Login email failed:", err.message));
     const token = Authorization.generateToken({
       id: entity._id,
       email: entity.email,

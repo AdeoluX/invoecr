@@ -49,6 +49,13 @@ router.get(
   InvoiceController.generateTemplatePreview
 );
 
+// Add new route for HTML template preview
+router.get(
+  `${BASE}/templates/:templateId/preview-html`,
+  Authorization.authenticateToken,
+  InvoiceController.generateTemplateHTMLPreview
+);
+
 // Parameterized routes (must come after specific routes)
 // PUT and DELETE routes must come before GET routes to avoid conflicts
 router.put(
@@ -57,7 +64,12 @@ router.put(
   Authorization.authenticateToken,
   InvoiceController.updateInvoice
 );
-router.delete(`${BASE}/:invoiceId`, InvoiceController.deleteInvoice);
+router.delete(`${BASE}/:invoiceId`, Authorization.authenticateToken, InvoiceController.deleteInvoice);
+router.patch(
+  `${BASE}/:invoiceId/convert`,
+  Authorization.authenticateToken,
+  InvoiceController.convertToInvoice
+);
 
 // GET routes
 router.get(`${BASE}/:code/initiate-payment`, InvoiceController.initiatePayment);
@@ -85,6 +97,13 @@ router.get(
   Authorization.authenticateToken,
   InvoiceController.downloadInvoiceHTMLPDF
 );
+
+router.get(
+  `${BASE}/:code/preview-html`,
+  Authorization.authenticateToken,
+  InvoiceController.getInvoiceHTML
+);
+
 
 // Nigeria-specific routes
 

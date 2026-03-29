@@ -48,6 +48,11 @@ class EntityController {
     return successResponse(req, res, {}, "Signature removed successfully");
   });
 
+  static getEntity = catchAsync(async (req, res, next) => {
+    const { id } = req.user;
+    const entity = await EntityService.getEntity(id);
+    return successResponse(req, res, entity, "Operation Successful");
+  });
   static editEntity = catchAsync(async (req, res, next) => {
     const entity = req.user;
     const data = req.body;

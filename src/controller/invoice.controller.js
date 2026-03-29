@@ -1,10 +1,11 @@
 const catchAsync = require("../utils/catchAsync");
-const { InvoiceService } = require("../services");
+const { InvoiceService, SubscriptionService } = require("../services");
 const { successResponse, redirect } = require("../utils/responder");
 const httpStatus = require("http-status");
 const moment = require("moment");
 const invoiceRepo = require("../repo/invoice.repo");
 const PDFService = require("../services/pdf.service");
+const HTMLPDFService = require("../services/htmlPdf.service");
 
 class InvoiceController {
   // Create a new invoice
@@ -49,21 +50,12 @@ class InvoiceController {
     const { invoiceId } = req.params;
     const user = req.user;
 
-    console.log("🔍 Update invoice request:", {
-      invoiceId,
-      userId: user.id,
-      body: req.body,
-    });
-
     // Find invoice by invoiceNumber (code)
     const invoice = await invoiceRepo.findOne({
       query: { invoiceNumber: invoiceId, entity: user.id },
     });
 
-    console.log("🔍 Invoice lookup result:", invoice ? "Found" : "Not found");
-
     if (!invoice) {
-      console.log("❌ Invoice not found for:", { invoiceId, userId: user.id });
       return res.status(404).json({
         success: false,
         message: "Invoice not found",
@@ -83,6 +75,14 @@ class InvoiceController {
     const { invoiceId } = req.params;
     const deletedInvoice = await InvoiceService.deleteInvoice(invoiceId);
     return successResponse(req, res, deletedInvoice);
+  });
+//
+  // Convert a Quote to an Invoice
+  static convertToInvoice = catchAsync(async (req, res, next) => {
+    const { invoiceId } = req.params;
+    const user = req.user;
+    const result = await InvoiceService.convertToInvoice(invoiceId, user.id);
+    return successResponse(req, res, result);
   });
 
   // Download invoice as PDF using HTML templates
@@ -130,13 +130,9 @@ class InvoiceController {
       // Set Content-Disposition based on preview parameter
       if (preview === "true" || preview === true) {
         // For preview - display inline in browser
-        res.setHeader(
-          "Content-Disposition",
-          `inline; filename="invoice_${invoice.invoiceNumber}_${moment().format(
-            "DD-MM-YYYY"
-          )}.pdf"`
-        );
+        res.setHeader("Content-Disposition", "inline");
       } else {
+
         // For download - force download
         res.setHeader(
           "Content-Disposition",
@@ -164,54 +160,83 @@ class InvoiceController {
       {
         id: "invoice1",
         name: "Classic",
-        description:
-          "Clean and professional design with modern blue theme and diagonal corner",
+        description: "Clean and professional with modern blue theme",
         preview: "/invoice/templates/invoice1/preview",
-        features: [
-          "Professional layout",
-          "Modern blue theme",
-          "Diagonal corner design",
-          "Company info box",
-          "Clickable payment links",
-        ],
+        features: ["Professional layout", "Modern blue theme", "Diagonal accents"],
+        isPremium: false,
       },
       {
         id: "invoice2",
-        name: "Modern",
-        description: "Contemporary design with red accents and flex layout",
+        name: "Modern Red",
+        description: "Contemporary design with bold red accents",
         preview: "/invoice/templates/invoice2/preview",
-        features: [
-          "Modern flex layout",
-          "Red color scheme",
-          "Company branding",
-          "Clickable payment links",
-        ],
+        features: ["Flex layout", "Red color scheme", "High contrast"],
+        isPremium: false,
       },
       {
         id: "invoice3",
         name: "Contemporary",
-        description: "Clean design with orange accents and modern typography",
+        description: "Clean design with warm orange accents",
         preview: "/invoice/templates/invoice3/preview",
-        features: [
-          "Contemporary design",
-          "Orange accents",
-          "Clean typography",
-          "Clickable payment links",
-        ],
+        features: ["Clean typography", "Orange accents", "Professional"],
+        isPremium: false,
       },
       {
         id: "invoice4",
-        name: "Modern Teal",
-        description:
-          "Professional design with dark teal/blue, white, and yellow/gold color scheme",
+        name: "Modern Teal Premium",
+        description: "Premium teal design with modern typography and sophisticated layout",
         preview: "/invoice/templates/invoice4/preview",
-        features: [
-          "Modern teal color scheme",
-          "Professional layout",
-          "Curved decorative elements",
-          "Clean typography",
-          "Clickable payment links",
-        ],
+        features: ["Teal Premium", "Geometric header", "Plus Jakarta Sans"],
+        isPremium: false,
+      },
+
+      {
+        id: "invoice5",
+        name: "Elegant Serif",
+        description: "Luxury design for high-end professional services",
+        preview: "/invoice/templates/invoice5/preview",
+        features: ["Gold accents", "Serif typography", "Luxury feel"],
+        isPremium: true,
+      },
+      {
+        id: "invoice6",
+        name: "Minimalist Mono",
+        description: "Bold black and white architectural design",
+        preview: "/invoice/templates/invoice6/preview",
+        features: ["B&W High Contrast", "Swiss design", "Minimalist"],
+        isPremium: true,
+      },
+      {
+        id: "invoice7",
+        name: "Bold Corporate",
+        description: "Strong structural design with deep slate tones",
+        preview: "/invoice/templates/invoice7/preview",
+        features: ["Sidebar info", "Slate & Steel", "Structured"],
+        isPremium: true,
+      },
+      {
+        id: "invoice8",
+        name: "Creative Gradient",
+        description: "Vibrant design with modern glassmorphism and gradients",
+        preview: "/invoice/templates/invoice8/preview",
+        features: ["Purple Gradients", "Rounded", "Glassmorphism"],
+        isPremium: true,
+      },
+      {
+        id: "invoice9",
+        name: "Industrial Grid",
+        description: "Technical, grid-based layout for modern industries",
+        preview: "/invoice/templates/invoice9/preview",
+        features: ["Technical Grid", "Monospaced font", "Bold borders"],
+        isPremium: true,
+      },
+      {
+        id: "invoice10",
+        name: "Eco Green",
+        description: "Soft, organic design with friendly green accents",
+        preview: "/invoice/templates/invoice10/preview",
+        features: ["Organic Green", "Rounded corners", "Friendly"],
+        isPremium: true,
       },
     ];
 
@@ -284,34 +309,42 @@ class InvoiceController {
         pdf0: "invoice1",
         pdf1: "invoice2",
         pdf2: "invoice3",
-        pdf3: "invoice1",
+        pdf3: "invoice4",
         invoice1: "invoice1",
         invoice2: "invoice2",
         invoice3: "invoice3",
         invoice4: "invoice4",
+        invoice5: "invoice5",
+        invoice6: "invoice6",
+        invoice7: "invoice7",
+        invoice8: "invoice8",
+        invoice9: "invoice9",
+        invoice10: "invoice10",
       };
 
       const htmlTemplate = templateMapping[templateId] || "invoice1";
+      const previewData = {
+        invoice: sampleInvoice,
+        entity: sampleEntity,
+        customer: sampleCustomer,
+        templateId: htmlTemplate,
+      };
 
       // Generate PDF with HTML template
-      const pdfBuffer = await PDFService.generateInvoicePdfFromHtml(
-        sampleInvoice,
-        sampleEntity,
-        sampleCustomer,
-        sampleSubscription,
-        htmlTemplate
+      const pdfBuffer = await HTMLPDFService.generateHTMLPDF(
+        previewData,
+        null,
+        true
       );
 
       // Set response headers for PDF
       res.setHeader("Content-Type", "application/pdf");
       res.setHeader("Content-Length", pdfBuffer.length);
-      res.setHeader(
-        "Content-Disposition",
-        `inline; filename="template_${templateId}_preview.pdf"`
-      );
+      res.setHeader("Content-Disposition", "inline");
 
       // Send PDF buffer
       res.send(pdfBuffer);
+
     } catch (error) {
       console.error("Template preview generation error:", error);
       return res.status(500).json({
@@ -322,11 +355,93 @@ class InvoiceController {
     }
   });
 
+  /**
+   * Generate invoice template HTML preview
+   */
+  static generateTemplateHTMLPreview = catchAsync(async (req, res, next) => {
+    const { templateId } = req.params;
+
+    try {
+      // Create sample data for preview
+      const previewData = {
+        invoice: {
+          invoiceNumber: "PREVIEW-001",
+          issueDate: new Date(),
+          dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          currency: "NGN",
+          status: "draft",
+          items: [
+            {
+              name: "Sample Product 1",
+              description: "High-quality sample product description",
+              quantity: 2,
+              unitPrice: 15000,
+            },
+            {
+              name: "Professional Service",
+              description: "Expert consulting and implementation",
+              quantity: 5,
+              unitPrice: 25000,
+            },
+          ],
+          taxRate: 7.5,
+          notes: "This is a sample invoice for template preview purposes.",
+          paymentTerms: "Due on receipt",
+        },
+        entity: {
+          name: "Your Business Name",
+          address: "123 Business Avenue, Suite 100\nLagos, Nigeria",
+          phone: "+234 800 000 0000",
+          email: "hello@yourbusiness.com",
+          website: "www.yourbusiness.com",
+          logo: { secure_url: "" },
+          signature: { secure_url: "" },
+        },
+        customer: {
+          name: "Sample Customer Ltd",
+          address: "45 Customer Road, Victoria Island\nLagos, Nigeria",
+          phone: "+234 700 000 0000",
+          email: "finance@samplecustomer.com",
+        },
+        templateId: templateId,
+      };
+
+      const htmlContent = await HTMLPDFService.generateHTMLInvoice(
+        previewData,
+        null,
+        true
+      );
+
+      res.setHeader("Content-Type", "text/html");
+      return res.send(htmlContent);
+    } catch (error) {
+      console.error("Template HTML preview generation error:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Error generating template HTML preview",
+        error: error.message,
+      });
+    }
+  });
+
+
   // Share invoice via WhatsApp
   static shareViaWhatsApp = catchAsync(async (req, res, next) => {
     const { code } = req.params;
     const { customerPhone } = req.body;
     const user = req.user;
+
+    // Feature gating for WhatsApp Sharing
+    const canAccessWhatsApp = await SubscriptionService.canAccessFeature(
+      user.id,
+      "whatsappSharing"
+    );
+    if (!canAccessWhatsApp) {
+      return res.status(403).json({
+        success: false,
+        message: "WhatsApp sharing is not available on your current plan.",
+      });
+    }
 
     const result = await InvoiceService.shareViaWhatsApp(
       code,
@@ -342,6 +457,18 @@ class InvoiceController {
     const { customerPhone, pdfUrl } = req.body;
     const user = req.user;
 
+    // Feature gating for WhatsApp Sharing
+    const canAccessWhatsApp = await SubscriptionService.canAccessFeature(
+      user.id,
+      "whatsappSharing"
+    );
+    if (!canAccessWhatsApp) {
+      return res.status(403).json({
+        success: false,
+        message: "WhatsApp sharing is not available on your current plan.",
+      });
+    }
+
     const result = await InvoiceService.sharePDFInvoiceViaWhatsApp(
       code,
       user.id,
@@ -356,6 +483,17 @@ class InvoiceController {
     const user = req.user;
     const filters = req.query;
 
+    const canAccessAnalytics = await SubscriptionService.canAccessFeature(
+      user.id,
+      "analytics"
+    );
+    if (!canAccessAnalytics) {
+      return res.status(403).json({
+        success: false,
+        message: "Analytics & Reports are not available on your current plan.",
+      });
+    }
+
     const analytics = await InvoiceService.getInvoiceAnalytics(
       user.id,
       filters
@@ -366,6 +504,22 @@ class InvoiceController {
   // Get dashboard summary
   static getDashboardSummary = catchAsync(async (req, res, next) => {
     const user = req.user;
+
+    const canAccessAnalytics = await SubscriptionService.canAccessFeature(
+      user.id,
+      "analytics"
+    );
+    if (!canAccessAnalytics) {
+      // Return a basic summary or empty data instead of 403 to avoid breaking the dashboard UI
+      return successResponse(req, res, {
+        summary: {
+          totalRevenue: 0,
+          totalInvoices: 0,
+          paymentSuccessRate: 0,
+          whatsappConversionRate: 0,
+        },
+      });
+    }
 
     const summary = await InvoiceService.getDashboardSummary(user.id);
     return successResponse(req, res, summary);
@@ -403,13 +557,9 @@ class InvoiceController {
       // Set Content-Disposition based on preview parameter
       if (preview === "true" || preview === true) {
         // For preview - display inline in browser
-        res.setHeader(
-          "Content-Disposition",
-          `inline; filename="invoice_${invoice.invoiceNumber}_${moment().format(
-            "DD-MM-YYYY"
-          )}.pdf"`
-        );
+        res.setHeader("Content-Disposition", "inline");
       } else {
+
         // For download - force download
         res.setHeader(
           "Content-Disposition",
@@ -430,7 +580,110 @@ class InvoiceController {
       });
     }
   });
+
+  /**
+   * Get invoice HTML for in-app preview
+   */
+  static getInvoiceHTML = catchAsync(async (req, res, next) => {
+    const { code } = req.params;
+    const { template = "invoice1" } = req.query;
+    const user = req.user;
+
+    const invoice = await InvoiceService.getInvoiceById(code, user.id);
+    if (!invoice) {
+      return res.status(404).json({
+        success: false,
+        message: "Invoice not found",
+      });
+    }
+
+    const data = {
+      invoice,
+      entity: invoice.entity,
+      customer: invoice.customer,
+      templateId: template,
+    };
+
+    const htmlContent = await HTMLPDFService.generateHTMLInvoice(
+      data,
+      invoice.entity.subscriptionPlan,
+      true
+    );
+
+    res.setHeader("Content-Type", "text/html");
+    return res.send(htmlContent);
+  });
+
+  /**
+   * Generate invoice template HTML preview
+   */
+  static generateTemplateHTMLPreview = catchAsync(async (req, res, next) => {
+    const { templateId } = req.params;
+
+    try {
+      // Create sample data for preview
+      const previewData = {
+        invoice: {
+          invoiceNumber: "PREVIEW-001",
+          issueDate: new Date(),
+          dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          currency: "NGN",
+          status: "draft",
+          items: [
+            {
+              name: "Sample Product 1",
+              description: "High-quality sample product description",
+              quantity: 2,
+              unitPrice: 15000,
+            },
+            {
+              name: "Professional Service",
+              description: "Expert consulting and implementation",
+              quantity: 5,
+              unitPrice: 25000,
+            },
+          ],
+          taxRate: 7.5,
+          notes: "This is a sample invoice for template preview purposes.",
+          paymentTerms: "Due on receipt",
+        },
+        entity: {
+          name: "Your Business Name",
+          address: "123 Business Avenue, Suite 100\nLagos, Nigeria",
+          phone: "+234 800 000 0000",
+          email: "hello@yourbusiness.com",
+          website: "www.yourbusiness.com",
+          logo: { secure_url: "" },
+          signature: { secure_url: "" },
+        },
+        customer: {
+          name: "Sample Customer Ltd",
+          address: "45 Customer Road, Victoria Island\nLagos, Nigeria",
+          phone: "+234 700 000 0000",
+          email: "finance@samplecustomer.com",
+        },
+        templateId: templateId,
+      };
+
+      const htmlContent = await HTMLPDFService.generateHTMLInvoice(
+        previewData,
+        null,
+        true
+      );
+
+      res.setHeader("Content-Type", "text/html");
+      return res.send(htmlContent);
+    } catch (error) {
+      console.error("Template HTML preview generation error:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Error generating template HTML preview",
+        error: error.message,
+      });
+    }
+  });
 }
+
 
 module.exports = {
   InvoiceController,
