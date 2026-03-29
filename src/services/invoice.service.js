@@ -503,12 +503,16 @@ class InvoiceService {
       paymentResponse.message
     );
 
-    // Update invoice with payment link
-    await invoiceRepository.update(invoice._id, {
-      paymentLink:
-        paymentResponse.data?.authorization_url || paymentResponse.data?.link,
-      paymentGateway: "paystack",
-    });
+    const { sendInvoiceEmail } = require("./email.service");
+    const paymentLink =
+      paymentResponse.data?.authorization_url || paymentResponse.data?.link;
+    sendInvoiceEmail(
+      invoice.customer.email,
+      invoice.customer.name,
+      amount ? amount : invoice.total,
+      invoice.invoiceNumber,
+      paymentLink
+    );
 
     return paymentResponse;
   };

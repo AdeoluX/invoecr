@@ -69,6 +69,9 @@ class AuthService {
         email: entity.email,
       });
 
+      const { sendWelcomeEmail } = require("./email.service");
+      sendWelcomeEmail(entity.email, entity.name || entity.first_name);
+
       return { entity, token };
     } catch (error) {
       // Handle duplicate key errors with more specific messages
@@ -83,14 +86,9 @@ class AuthService {
     abortIf(!entity, httpStatus.UNAUTHORIZED, "Invalid email or password");
     const isMatch = await bcrypt.compare(password, entity.password);
     abortIf(!isMatch, httpStatus.UNAUTHORIZED, "Invalid email or password");
-    new EmailBuilder().send(entity.email, "login", {
-      userName: entity.first_name || entity.last_name || entity.name,
-      loginTime: new Date().toLocaleString(),
-      device: "Unknown",
-      location: "Unknown",
-      supportEmail: process.env.SUPPORT_EMAIL,
-      supportPhone: process.env.SUPPORT_PHONE,
-    }).catch((err) => console.error("Login email failed:", err.message));
+    const { sendLoginEmail } = require("./email.service");
+    sendLoginEmail(entity.email, entity.first_name || entity.last_name || entity.name, "Unknown")
+      .catch((err) => console.error("Login email failed:", err.message));
     const token = Authorization.generateToken({
       id: entity._id,
       email: entity.email,

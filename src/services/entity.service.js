@@ -135,6 +135,9 @@ class EntityService {
       name: entity.name,
       password,
     });
+    const { sendAccountCreatedEmail } = require("./email.service");
+    sendAccountCreatedEmail(createdEntity.email, createdEntity.first_name, "generated-password");
+
     return createdEntity;
   };
 }
