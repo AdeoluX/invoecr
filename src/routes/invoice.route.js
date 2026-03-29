@@ -100,7 +100,6 @@ router.get(
 
 router.get(
   `${BASE}/:code/preview-html`,
-  Authorization.authenticateToken,
   InvoiceController.getInvoiceHTML
 );
 

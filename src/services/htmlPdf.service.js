@@ -187,7 +187,7 @@ class HTMLPDFService {
       "{{TAX_RATE}}": `${(taxRate * 100).toFixed(1)}%`,
       "{{TAX_AMOUNT}}": formatCurrency(tax),
       "{{TOTAL}}": formatCurrency(total),
-      "{{PAYMENT_LINK}}": `${process.env.BACKEND_URL || "http://localhost:3000"}/invoice/${invoice.invoiceNumber}/initiate-payment`,
+      "{{PAYMENT_LINK}}": `${(process.env.BACKEND_URL || "http://localhost:3000").replace(/\/$/, '')}${ (process.env.BACKEND_URL || "").includes('/api/v1') ? '' : '/api/v1' }/invoice/${invoice.invoiceNumber}/initiate-payment`,
       "{{STATUS}}": (invoice.status || "draft").toUpperCase(),
       "{{PAYMENT_STATUS}}": (invoice.paymentStatus || "unpaid").toUpperCase(),
       "{{DOCUMENT_TITLE}}": invoice.type === "quote" ? "ESTIMATE" : "INVOICE",

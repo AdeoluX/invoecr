@@ -299,8 +299,12 @@ class InvoiceService {
 
   // Get a single invoice by ID
   static getInvoiceById = async (code, entity_id) => {
+    const query = mongoose.Types.ObjectId.isValid(code)
+      ? { $or: [{ _id: code }, { invoiceNumber: code }], entity: entity_id }
+      : { invoiceNumber: code, entity: entity_id };
+
     const invoice = await invoiceRepository.findOne({
-      query: { invoiceNumber: code, entity: entity_id },
+      query,
       populate: [
         { path: "customer", select: "name email phone businessType" },
         { path: "entity" },
@@ -315,8 +319,12 @@ class InvoiceService {
    * This is used for sharing invoices with customers
    */
   static getInvoiceByCodePublic = async (code) => {
+    const query = mongoose.Types.ObjectId.isValid(code)
+      ? { $or: [{ _id: code }, { invoiceNumber: code }] }
+      : { invoiceNumber: code };
+
     const invoice = await invoiceRepository.findOne({
-      query: { invoiceNumber: code },
+      query,
       populate: [
         { path: "customer" },
         { path: "entity" },
@@ -327,8 +335,12 @@ class InvoiceService {
   };
 
   static downloadInvoiceById = async (code, entity_id) => {
+    const query = mongoose.Types.ObjectId.isValid(code)
+      ? { $or: [{ _id: code }, { invoiceNumber: code }], entity: entity_id }
+      : { invoiceNumber: code, entity: entity_id };
+
     const invoice = await invoiceRepository.findOne({
-      query: { invoiceNumber: code, entity: entity_id },
+      query,
       populate: [
         { path: "customer", select: "name email" },
         { path: "entity" },
@@ -457,8 +469,12 @@ class InvoiceService {
   };
 
   static initiatePayment = async (code, amount = null) => {
+    const query = mongoose.Types.ObjectId.isValid(code)
+      ? { $or: [{ _id: code }, { invoiceNumber: code }] }
+      : { invoiceNumber: code };
+
     const invoice = await invoiceRepository.findOne({
-      query: { invoiceNumber: code },
+      query,
       populate: [
         { path: "customer", select: "name email" },
         { path: "entity" },
@@ -482,6 +498,11 @@ class InvoiceService {
         isActive: true,
       },
     });
+    abortIf(
+      !getSubAccount,
+      httpStatus.BAD_REQUEST,
+      "No active bank account/subaccount found for this entity. Please set up your bank details."
+    );
     const transaction = await transactionRepo.create({
       customer: invoice.customer._id,
       entity: invoice.entity._id,
