@@ -1,7 +1,7 @@
 const inventoryRepository = require("../repo/inventory.repo");
 const entityRepository = require("../repo/entity.repo");
 const { abortIf } = require("../utils/responder");
-const httpStatus = require("http-status");
+const httpStatus = require("http-status").status;
 const { UtilsService } = require("./utils.service");
 const { deleteImage } = require("../utils/cloudinary.util");
 

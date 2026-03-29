@@ -1,6 +1,6 @@
 const { listBanks, verifyBankAccount } = require("../utils/bank.utils");
 const { abortIf } = require("../utils/responder");
-const httpStatus = require("http-status");
+const httpStatus = require("http-status").status;
 const {
   PaymentGateway,
   PaystackPaymentGateway,

@@ -1,7 +1,7 @@
 const catchAsync = require("../utils/catchAsync");
 const { InvoiceService, SubscriptionService } = require("../services");
 const { successResponse, redirect } = require("../utils/responder");
-const httpStatus = require("http-status");
+const httpStatus = require("http-status").status;
 const moment = require("moment");
 const invoiceRepo = require("../repo/invoice.repo");
 const PDFService = require("../services/pdf.service");

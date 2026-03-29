@@ -3,7 +3,7 @@ const express = require("express");
 const app = express();
 
 const ApiError = require("./src/utils/ApiError");
-const httpStatus = require("http-status");
+const httpStatus = require("http-status").status;
 const cors = require("cors");
 const {
   authRoute,

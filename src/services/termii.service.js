@@ -1,6 +1,6 @@
 const axios = require("axios");
 const { abortIf } = require("../utils/responder");
-const httpStatus = require("http-status");
+const httpStatus = require("http-status").status;
 
 class TermiiService {
   constructor() {

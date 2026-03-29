@@ -2,7 +2,7 @@ const catchAsync = require("../utils/catchAsync");
 const CardService = require("../services/card.service");
 const { successResponse } = require("../utils/responder");
 const { abortIf } = require("../utils/responder");
-const httpStatus = require("http-status");
+const httpStatus = require("http-status").status;
 
 class CardController {
   // Initialize card saving process

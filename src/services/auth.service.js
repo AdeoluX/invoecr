@@ -1,7 +1,7 @@
 const bcrypt = require("bcryptjs");
 const Entity = require("../models/entity.model");
 const { abortIf } = require("../utils/responder");
-const httpStatus = require("http-status");
+const httpStatus = require("http-status").status;
 const entityRepository = require("../repo/entity.repo");
 const jwt = require("jsonwebtoken");
 const Authorization = require("../utils/authorization.service");

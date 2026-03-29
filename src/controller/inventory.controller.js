@@ -1,7 +1,7 @@
 const catchAsync = require("../utils/catchAsync");
 const { InventoryService } = require("../services/inventory.service");
 const { successResponse } = require("../utils/responder");
-const httpStatus = require("http-status");
+const httpStatus = require("http-status").status;
 
 class InventoryController {
   static createInventory = catchAsync(async (req, res, next) => {

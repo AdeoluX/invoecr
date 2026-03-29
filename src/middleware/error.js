@@ -1,5 +1,5 @@
 require('dotenv').config();
-const httpStatus = require('http-status');
+const httpStatus = require('http-status').status;
 const ApiError = require('../utils/ApiError');
 const { errorResponse } = require('../utils/responder');
 

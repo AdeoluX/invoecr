@@ -1,7 +1,7 @@
 const Invoice = require("../models/invoice.model");
 const crypto = require("crypto");
 const { abortIf } = require("../utils/responder");
-const httpStatus = require("http-status");
+const httpStatus = require("http-status").status;
 const invoiceRepository = require("../repo/invoice.repo");
 const customerRepository = require("../repo/customer.repo");
 const entityRepository = require("../repo/entity.repo");

@@ -1,7 +1,7 @@
 const catchAsync = require("../utils/catchAsync");
 const { AuthService } = require("../services");
 const { successResponse } = require("../utils/responder");
-const httpStatus = require("http-status");
+const httpStatus = require("http-status").status;
 
 class AuthController {
   // Signup

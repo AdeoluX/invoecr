@@ -1,7 +1,7 @@
 const catchAsync = require("../utils/catchAsync");
 const { EntityService } = require("../services");
 const { successResponse } = require("../utils/responder");
-const httpStatus = require("http-status");
+const httpStatus = require("http-status").status;
 
 class EntityController {
   static addBank = catchAsync(async (req, res, next) => {
