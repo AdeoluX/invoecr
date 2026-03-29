@@ -1,7 +1,7 @@
 const catchAsync = require("../utils/catchAsync");
 const { SubscriptionService } = require("../services");
 const { successResponse, abortIf } = require("../utils/responder");
-const httpStatus = require("http-status").default;
+const httpStatus = require("http-status");
 
 class SubscriptionController {
   // Get all available subscription plans

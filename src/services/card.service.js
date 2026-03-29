@@ -1,7 +1,7 @@
 const cardRepo = require("../repo/card.repo");
 const { PaystackPaymentGateway } = require("../utils/paystack.utils");
 const { abortIf } = require("../utils/responder");
-const httpStatus = require("http-status").default;
+const httpStatus = require("http-status");
 
 class CardService {
   /**

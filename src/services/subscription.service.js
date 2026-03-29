@@ -2,7 +2,7 @@ const SubscriptionPlan = require("../models/subscription.model");
 const Entity = require("../models/entity.model");
 const CardService = require("./card.service");
 const { abortIf } = require("../utils/responder");
-const httpStatus = require("http-status").default;
+const httpStatus = require("http-status");
 
 // Constants
 const SUBSCRIPTION_DURATION_DAYS = 30;

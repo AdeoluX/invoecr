@@ -1,4 +1,4 @@
-const { default: mongoose } = require("mongoose");
+const mongoose = require("mongoose");
 const invoiceRepository = require("../repo/invoice.repo");
 const transactionRepo = require("../repo/transaction.repo");
 

@@ -1,13 +1,13 @@
 const Invoice = require("../models/invoice.model");
 const crypto = require("crypto");
 const { abortIf } = require("../utils/responder");
-const httpStatus = require("http-status").default;
+const httpStatus = require("http-status");
 const invoiceRepository = require("../repo/invoice.repo");
 const customerRepository = require("../repo/customer.repo");
 const entityRepository = require("../repo/entity.repo");
 const PDFDocument = require("pdfkit");
 const getPagination = require("../utils/pagination");
-const { default: mongoose } = require("mongoose");
+const mongoose = require("mongoose");
 const { generateInvoice } = require("../utils/invoice");
 const { PaystackPaymentGateway } = require("../utils/paystack.utils");
 const transactionRepo = require("../repo/transaction.repo");
@@ -522,22 +522,25 @@ class InvoiceService {
       amount: amount ? amount : invoice.total,
       reference,
       subaccount: getSubAccount.subAccountCode,
-      metadata: {
-        custom_fields: [
-          {
-            display_name: "Company",
-            variable_name: "company_name",
-            value: invoice.entity.name,
-          },
-          {
-            display_name: "Logo",
-            variable_name: "logo_url",
-            value:
-              invoice?.entity?.logo ||
-              "https://unsplash.com/photos/a-person-swimming-in-the-ocean-with-a-mountain-in-the-background-s6g6ZSxM3kQ",
-          },
-        ],
-      },
+        metadata: {
+          type: "invoice_payment",
+          invoiceId: invoice._id,
+          invoiceNumber: invoice.invoiceNumber,
+          custom_fields: [
+            {
+              display_name: "Company",
+              variable_name: "company_name",
+              value: invoice.entity.name,
+            },
+            {
+              display_name: "Logo",
+              variable_name: "logo_url",
+              value:
+                invoice?.entity?.logo ||
+                "https://unsplash.com/photos/a-person-swimming-in-the-ocean-with-a-mountain-in-the-background-s6g6ZSxM3kQ",
+            },
+          ],
+        },
     });
     abortIf(
       !paymentResponse.success,

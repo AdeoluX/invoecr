@@ -1,7 +1,7 @@
 const bcrypt = require("bcryptjs");
 const Entity = require("../models/entity.model");
 const { abortIf } = require("../utils/responder");
-const httpStatus = require("http-status").default;
+const httpStatus = require("http-status");
 const bankRepository = require("../repo/bankAccount.repo");
 const entityRepository = require("../repo/entity.repo");
 const { PaystackPaymentGateway } = require("../utils/paystack.utils");

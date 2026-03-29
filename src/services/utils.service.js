@@ -41,18 +41,36 @@ class UtilsService {
       console.error("Payment verification failed:", verification.message);
       return {};
     }
-    //save the card
-    const cardSaveResult = await CardService.saveCardFromWebhook(
-      verification.data.metadata.entityId,
-      verification.data.authorization
-    );
-    if (!cardSaveResult.success) {
-      console.error("Card save failed:", cardSaveResult.message);
-      return {};
+
+    let metadata = verification.data.metadata;
+    if (typeof metadata === 'string') {
+      try {
+        metadata = JSON.parse(metadata);
+      } catch (e) {
+        console.error("Error parsing metadata string:", e);
+      }
     }
+
+    // Handle invoice payment if type is invoice_payment
+    if (metadata?.type === 'invoice_payment') {
+      console.log("💰 Processing invoice payment via callback");
+      await this.handleInvoicePayment(verification.data);
+    }
+    
+    // Handle card save (which might also happen during payment)
+    if (metadata?.type === 'card_save' || metadata?.purpose === 'card_verification') {
+      const cardSaveResult = await CardService.saveCardFromWebhook(
+        metadata?.entityId,
+        verification.data.authorization
+      );
+      if (!cardSaveResult.success && cardSaveResult.message !== 'Card already saved') {
+        console.error("Card save failed:", cardSaveResult.message);
+      }
+    }
+
     return {
       success: true,
-      message: "Payment verification successful",
+      message: "Callback processed successfully",
       data: verification.data,
     };
   };
@@ -121,7 +139,14 @@ class UtilsService {
         return {};
       }
 
-      const metadata = data.metadata;
+      let metadata = data.metadata;
+      if (typeof metadata === 'string') {
+        try {
+          metadata = JSON.parse(metadata);
+        } catch (e) {
+          console.error("Error parsing metadata string:", e);
+        }
+      }
       const purpose = metadata?.purpose;
 
       // Handle card saving
@@ -153,8 +178,15 @@ class UtilsService {
   // Handle card saving
   static async handleCardSave(data) {
     try {
-      const metadata = data.metadata;
-      const entityId = metadata.entityId;
+      let metadata = data.metadata;
+      if (typeof metadata === 'string') {
+        try {
+          metadata = JSON.parse(metadata);
+        } catch (e) {
+          console.error("Error parsing metadata string:", e);
+        }
+      }
+      const entityId = metadata?.entityId;
       const authorization = data.authorization;
 
       if (!authorization || !authorization.authorization_code) {
@@ -217,9 +249,16 @@ class UtilsService {
   // Handle subscription payment
   static async handleSubscriptionPayment(data) {
     try {
-      const metadata = data.metadata;
-      const entityId = metadata.entityId;
-      const planName = metadata.planName;
+      let metadata = data.metadata;
+      if (typeof metadata === 'string') {
+        try {
+          metadata = JSON.parse(metadata);
+        } catch (e) {
+          console.error("Error parsing metadata string:", e);
+        }
+      }
+      const entityId = metadata?.entityId;
+      const planName = metadata?.planName;
 
       // Update subscription status after successful payment
       const subscriptionService = require("./subscription.service");
