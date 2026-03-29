@@ -28,7 +28,7 @@ const createInvoiceSchema = {
       issueDate: Joi.date().required(),
       dueDate: Joi.date().optional(),
       status: Joi.string()
-        .valid("draft", "sent", "paid", "overdue")
+        .valid("draft", "sent", "paid", "overdue", "published")
         .default("draft"),
       notes: Joi.string().optional().allow(""),
       terms: Joi.string().optional().allow(""),

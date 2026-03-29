@@ -589,7 +589,14 @@ class InvoiceController {
     const { template = "invoice1" } = req.query;
     const user = req.user;
 
-    const invoice = await InvoiceService.getInvoiceById(code, user.id);
+    // Get invoice. Use public method if no user (sharing mode)
+    let invoice;
+    if (user && user.id) {
+      invoice = await InvoiceService.getInvoiceById(code, user.id);
+    } else {
+      invoice = await InvoiceService.getInvoiceByCodePublic(code);
+    }
+
     if (!invoice) {
       return res.status(404).json({
         success: false,

@@ -130,6 +130,10 @@ class InvoiceService {
       matchStage.status = { $in: status.split(",") };
     }
 
+    if (filters.paymentStatus) {
+      matchStage.paymentStatus = { $in: filters.paymentStatus.split(",") };
+    }
+
     if (gteAmount || lteAmount) {
       matchStage.subtotal = {};
       if (gteAmount) matchStage.subtotal.$gte = Number(gteAmount);
@@ -298,7 +302,23 @@ class InvoiceService {
     const invoice = await invoiceRepository.findOne({
       query: { invoiceNumber: code, entity: entity_id },
       populate: [
-        { path: "customer", select: "name email" },
+        { path: "customer", select: "name email phone businessType" },
+        { path: "entity" },
+      ],
+    });
+    abortIf(!invoice, httpStatus.NOT_FOUND, "Invoice not found");
+    return invoice;
+  };
+
+  /**
+   * Get an invoice by code publicly (no entity_id required)
+   * This is used for sharing invoices with customers
+   */
+  static getInvoiceByCodePublic = async (code) => {
+    const invoice = await invoiceRepository.findOne({
+      query: { invoiceNumber: code },
+      populate: [
+        { path: "customer" },
         { path: "entity" },
       ],
     });
